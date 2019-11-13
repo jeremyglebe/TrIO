@@ -13,6 +13,8 @@
 #include <conio.h>
 #include <fcntl.h>
 #include <windows.h>
+#include <locale>
+#include <codecvt>
 #else
 // Libraries only used by non-Windows
 #include <unistd.h>
@@ -32,14 +34,14 @@
 
 namespace TermGame
 {
-    /**
+/**
      * Gets a single character from stdin without need for a newline buffer.
      * (No need to press enter/return to finish input)
      * @return char  the character entered
      */
-    char getch();
+char getch();
 
-    /**
+/**
      * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters
      * depending on the user's platform.
      * @return std::string  a string containing one of four values that
@@ -48,44 +50,44 @@ namespace TermGame
      * @exception KeyPressError  exception is thrown any time a non-arrow key
      * is pressed in response to this function
      */
-    std::string getarrow();
+std::string getarrow();
 
-    void sleep(unsigned int ms);
+void sleep(unsigned int ms);
 
-}
+} // namespace TermGame
 
 namespace TermPrint
 {
-    /**
+/**
      * TermPrint color codes stored as string objects for easy use.
      * The codes will also be documented on the repository.
      */
-    static const unsigned short DEFAULT = 0;
-    static const unsigned short BLACK = 1;
-    static const unsigned short RED = 2;
-    static const unsigned short YELLOW = 3;
-    static const unsigned short GREEN = 4;
-    static const unsigned short BLUE = 5;
-    static const unsigned short CYAN = 6;
-    static const unsigned short MAGENTA = 7;
-    static const unsigned short WHITE = 8;
+static const unsigned short DEFAULT = 0;
+static const unsigned short BLACK = 1;
+static const unsigned short RED = 2;
+static const unsigned short YELLOW = 3;
+static const unsigned short GREEN = 4;
+static const unsigned short BLUE = 5;
+static const unsigned short CYAN = 6;
+static const unsigned short MAGENTA = 7;
+static const unsigned short WHITE = 8;
 
-    /**
+/**
      * Prints a string to stdout. Interprets any TermPrint
      * color codes of the form &XY where X is the foreground
      * code and Y is the background code.
      * @param msg the string that the user wants to print
     */
-    void print(std::string msg);
-    /**
+void print(std::string msg);
+/**
      * Prints a string to stdout. Overrides any TermPrint
      * color codes found in the text with color passed in
      * by parameter.
      * @param msg the string that the user wants to print
      * @param forecolor the color of the text in the string
      */
-    void print(std::string msg, unsigned short forecolor);
-    /**
+void print(std::string msg, unsigned short forecolor);
+/**
      * Prints a string to stdout. Overrides any TermPrint
      * color codes found in the text with color passed in
      * by parameter.
@@ -93,29 +95,29 @@ namespace TermPrint
      * @param forecolor the color of the text in the string
      * @param backcolor the color behind the text in the string
      */
-    void print(std::string msg, unsigned short forecolor, unsigned short backcolor);
+void print(std::string msg, unsigned short forecolor, unsigned short backcolor);
 
-    void clear();
+void clear();
 
-    /**
+/**
      * Fuses two multi-line string together for printing side-by-side
      * @param left the string that will be on the left half of the fused string
      * @param right the string that will be on the right half of the fused string
      */
-    std::string fuse(std::string left, std::string right);
-    /**
+std::string fuse(std::string left, std::string right);
+/**
      * Fuses two multi-line string together for printing side-by-side
      * @param left the string that will be on the left half of the fused string
      * @param right the string that will be on the right half of the fused string
      * @param pad bool, whether to pad each line of the string to be the same width
      */
-    std::string fuse(std::string left, std::string right, bool pad);
-    /**
+std::string fuse(std::string left, std::string right, bool pad);
+/**
      * Split a string and store each new substring in a vector.
      * @param text the original string
      * @param delim the delimiting character to split by
      */
-    std::vector<std::string> splitstring(std::string text, char delim);
+std::vector<std::string> splitstring(std::string text, char delim);
 
 /**
  *   _____ _______ ____  _____  _ 
@@ -133,59 +135,75 @@ namespace TermPrint
  */
 
 #if defined(WINDOWS)
-    // Windows fix bool.
-    static bool _winFix;
-    // We must have a reference to the active terminal for Windows' color API
-    static HANDLE _active_terminal;
+// Windows fix bool.
+static bool _winFix;
+// We must have a reference to the active terminal for Windows' color API
+static HANDLE _active_terminal;
 #endif
 
-    /**
-     * Internal color code definitions which will work
-     * with the Windows color API (or ANSI on *nix)
-     * TermPrint color codes are translated back to these when printing.
-     */
 #if defined(WINDOWS)
-    static const unsigned short _BLACK = 0;
-    static const unsigned short _BLUE = 1;
-    static const unsigned short _GREEN = 2;
-    static const unsigned short _CYAN = 3;
-    static const unsigned short _RED = 4;
-    static const unsigned short _MAGENTA = 5;
-    static const unsigned short _YELLOW = 6;
-    static const unsigned short _WHITE = 7;
-    static const unsigned short _RESET_COLOR = 7;
-    static const unsigned short _RESET_BACK_COLOR = 0;
-#else
-    static const unsigned short _BLACK = 30;
-    static const unsigned short _RED = 31;
-    static const unsigned short _GREEN = 32;
-    static const unsigned short _YELLOW = 33;
-    static const unsigned short _BLUE = 34;
-    static const unsigned short _MAGENTA = 35;
-    static const unsigned short _CYAN = 36;
-    static const unsigned short _WHITE = 37;
-    static const unsigned short _RESET_COLOR = 39;
+/**
+     * Instead of making a #if every time a string shows up and making the
+     * string a wide string if we're on Windows, we can overload the <<
+     * operator to work with wostreams and strings so lines like:
+     * wcout << "Hello World!";
+     * will actually work. We're just going to convert the input string
+     * into a wstring.
+     * @param out the wide ostream to be output to
+     * @param text the text to be converted to a wstring
+     * @return the same ostream being used (for chaining output statements)
+     */
+std::wostream &operator<<(std::wostream &out, std::string text);
 #endif
-}
+
+/**
+ * Internal color code definitions which will work
+ * with the Windows color API (or ANSI on *nix)
+ * TermPrint color codes are translated back to these when printing.
+ */
+#if defined(WINDOWS)
+static const unsigned short _BLACK = 0;
+static const unsigned short _BLUE = 1;
+static const unsigned short _GREEN = 2;
+static const unsigned short _CYAN = 3;
+static const unsigned short _RED = 4;
+static const unsigned short _MAGENTA = 5;
+static const unsigned short _YELLOW = 6;
+static const unsigned short _WHITE = 7;
+static const unsigned short _RESET_COLOR = 0;
+#else
+static const unsigned short _BLACK = 30;
+static const unsigned short _RED = 31;
+static const unsigned short _GREEN = 32;
+static const unsigned short _YELLOW = 33;
+static const unsigned short _BLUE = 34;
+static const unsigned short _MAGENTA = 35;
+static const unsigned short _CYAN = 36;
+static const unsigned short _WHITE = 37;
+static const unsigned short _RESET_COLOR = 39;
+#endif
+} // namespace TermPrint
 
 /**
  * Namespace which holds exception classes and other error
  * handling for the TermGame and TermPrint namespaces.
  */
-namespace TermError{
-    /**
+namespace TermError
+{
+/**
      * Exception for incorrect key pressed in input functions from TermGame.
      * This is useful for error handling and debugging.
      */
-    class KeyPressError : public std::exception
-    {
-        std::string what_message;
-    public:
-        KeyPressError();
-        KeyPressError(std::string what_message);
-        virtual const char *what() const throw();
-    };
-}
+class KeyPressError : public std::exception
+{
+    std::string what_message;
+
+public:
+    KeyPressError();
+    KeyPressError(std::string what_message);
+    virtual const char *what() const throw();
+};
+} // namespace TermError
 
 /*
  *  ______                _   _               _____                 _                           _        _   _                 
@@ -197,7 +215,6 @@ namespace TermError{
  *                                                           | |                                                               
  *                                                           |_|                                                               
  */
-
 
 /*
  *  _____              ___                  ___             _   _             
@@ -317,7 +334,8 @@ void TermGame::sleep(unsigned int ms)
  * code and Y is the background code.
  * @param msg the string that the user wants to print
  */
-void TermPrint::print(std::string msg){
+void TermPrint::print(std::string msg)
+{
     // Internal colors mapped in an array in order of the
     // public facing color codes.
     static const unsigned short _COLORS[] = {
@@ -329,47 +347,60 @@ void TermPrint::print(std::string msg){
         _BLUE,
         _CYAN,
         _MAGENTA,
-        _WHITE
-    };
+        _WHITE};
     // split the strings by the color code delimeter '&'
     std::vector<std::string> strings = splitstring(msg, '&');
 #if defined(WINDOWS)
     std::wcout << strings[0];
-    for(int i = 1; i < strings.size(); i++){
-        if(strings[i] == ""){
+    for (int i = 1; i < strings.size(); i++)
+    {
+        if (strings[i] == "")
+        {
             std::wcout << '&';
         }
-        else{
-            if(strings[i - 1] != ""){
+        else
+        {
+            if (i < 2 || strings[i - 1] != "")
+            {
                 // Get our color codes
                 int fg_code = strings[i][0] - '0';
                 int bg_code = strings[i][1] - '0';
+                // std::wcout << "\n\nRECOLORING, COLOR CODES: (" << fg_code << ", " << bg_code << ")\n\n";
+                // TermGame::getch();
                 // Remove the color codes from the string
-                strings[i].erase(0,2);
+                strings[i].erase(0, 2);
                 // Now lets actually use those color codes
                 if (_COLORS[bg_code] != 0)
+                {
                     SetConsoleTextAttribute(_active_terminal, (16 * _COLORS[bg_code]) + _COLORS[fg_code]);
+                }
                 else
-                    SetConsoleTextAttribute(_active_terminal, (16 * _RESET_BACK_COLOR) + _COLORS[fg_code]);
+                {
+                    SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _COLORS[fg_code]);
+                }
             }
             std::wcout << strings[i];
         }
     }
     // Reset the terminal colors after the text is done printing
-    SetConsoleTextAttribute(_active_terminal, (16 * _RESET_BACK_COLOR) + _RESET_COLOR);
+    SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
 #else
     std::cout << strings[0];
-    for(int i = 1; i < strings.size(); i++){
-        if(strings[i] == ""){
+    for (int i = 1; i < strings.size(); i++)
+    {
+        if (strings[i] == "")
+        {
             std::cout << '&';
         }
-        else{
-            if(i < 2 || strings[i - 1] != ""){
+        else
+        {
+            if (i < 2 || strings[i - 1] != "")
+            {
                 // Get our color codes
                 int fg_code = strings[i][0] - '0';
                 int bg_code = strings[i][1] - '0';
                 // Remove the color codes from the string
-                strings[i].erase(0,2);
+                strings[i].erase(0, 2);
                 // Now lets actually use those color codes
                 std::cout << "\033[" << _COLORS[fg_code] << ';' << _COLORS[bg_code] + 10 << 'm';
             }
@@ -387,9 +418,10 @@ void TermPrint::print(std::string msg){
  * @param msg the string that the user wants to print
  * @param forecolor the color of the text in the string
  */
-void TermPrint::print(std::string msg, unsigned short forecolor){
+void TermPrint::print(std::string msg, unsigned short forecolor)
+{
 #if defined(WINDOWS)
-    print(msg, forecolor, _RESET_BACK_COLOR);
+    print(msg, forecolor, _BLACK);
 #else
     print(msg, forecolor, _RESET_COLOR);
 #endif
@@ -402,10 +434,26 @@ void TermPrint::print(std::string msg, unsigned short forecolor){
  * @param forecolor the color of the text in the string
  * @param backcolor the color behind the text in the string
  */
-void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short backcolor){
+void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short backcolor)
+{
+    // Internal colors mapped in an array in order of the
+    // public facing color codes.
+    static const unsigned short _COLORS[] = {
+        _RESET_COLOR,
+        _BLACK,
+        _RED,
+        _YELLOW,
+        _GREEN,
+        _BLUE,
+        _CYAN,
+        _MAGENTA,
+        _WHITE};
+    forecolor = _COLORS[forecolor];
+    backcolor = _COLORS[backcolor];
 #if defined(WINDOWS)
     // If we're using windows and it has not yet been fixed
-    if(!_winFix){
+    if (!_winFix)
+    {
         // set the console mode for unicode
         _setmode(_fileno(stdout), _O_U16TEXT);
         // We must have a reference to the active terminal for Windows' color API
@@ -421,7 +469,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
     // the addition below which generates a base 10 equivalent.
     SetConsoleTextAttribute(_active_terminal, (16 * backcolor) + forecolor);
     std::wcout << msg;
-    SetConsoleTextAttribute(_active_terminal, (16 * _RESET_BACK_COLOR) + _RESET_COLOR);
+    SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
 #else
     // This will all run if we are using *nix
     // print the color code for foreground and add 10 to convert foreground colors to background
@@ -431,10 +479,11 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
 #endif
 }
 
-void TermPrint::clear(){
+void TermPrint::clear()
+{
 #if defined(WINDOWS)
-    // if using Windows, clear the screen with conio.h
-    clrscr();
+    // if using Windows, fake it by going down lots of lines
+    std::wcout << std::string(40, '\n');
 #else
     // on *nix use ANSI escape
     std::cout << "\033[2J";
@@ -533,6 +582,34 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
     }
     return strings;
 }
+
+#if defined(WINDOWS)
+/**
+     * Instead of making a #if every time a string shows up and making the
+     * string a wide string if we're on Windows, we can overload the <<
+     * operator to work with wostreams and strings so lines like:
+     * wcout << "Hello World!";
+     * will actually work. We're just going to convert the input string
+     * into a wstring.
+     * @param out the wide ostream to be output to
+     * @param text the text to be converted to a wstring
+     * @return the same ostream being used (for chaining output statements)
+     */
+std::wostream &TermPrint::operator<<(std::wostream &out, std::string text)
+{
+    /**
+     * create a string <-> wide string converter
+     * example from stack overflow
+     * std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+     * std::string narrow = converter.to_bytes(wide_utf16_source_string);
+     * std::wstring wide = converter.from_bytes(narrow_utf8_source_string);
+     */
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wide_text = converter.from_bytes(text);
+    out << wide_text;
+    return out;
+}
+#endif
 
 /*
  *  _____              ___                   ___             _   _             

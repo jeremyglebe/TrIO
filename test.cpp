@@ -64,12 +64,18 @@ int main()
 
     // Test the color code interpreters
     TP::print("\n[TEST COLOR INTERPRETATION]\n");
-    TP::print("This is colored! (and ignores codes like &72)\n", 31, 37);
-    TP::print("This is also colored! (and will also ignore codes like &31)\n", 34);
-    TP::print("This is not!\n");
-    TP::print("But this is&50 colored using &42TermPrint escapes!\n");
-    TP::print("I can print with escapes &18&& the '&&' character.\n");
-    TP::print("Notice how color resets after printing?\n");
+    TP::print("This is colored! (and ignores codes like &72)", TP::RED, TP::WHITE);
+    TP::print("\n");
+    TP::print("This is also colored! (and will also ignore codes like &31)", TP::BLUE);
+    TP::print("\n");
+    TP::print("This is not!");
+    TP::print("\n");
+    TP::print("But this is&50 colored using &42TermPrint escapes!");
+    TP::print("\n");
+    TP::print("I can print with escapes &18&& the '&&' character.");
+    TP::print("\n");
+    TP::print("Notice how color resets after printing?");
+    TP::print("\n");
 
     // Can we fuse strings with color codes?
     TP::print("\n[TEST FUSE && COLOR]\n");
@@ -88,6 +94,6 @@ int main()
     //TP::print(TP::fuse(card1, card2, true));
     TP::print(TP::fuse(card1, card2, true));
 
-    TG::sleep(10000);
-    TP::clear();
+    // TG::sleep(15000);
+    // TP::clear();
 }
