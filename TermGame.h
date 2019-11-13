@@ -4,9 +4,10 @@
 #define WINDOWS true
 #endif
 // Included libraries
+#include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include <string>
-#include <iostream>
 #include <vector>
 #if defined(WINDOWS)
 // Libraries only used in Windows
@@ -77,16 +78,20 @@ static const unsigned short WHITE = 8;
      * color codes of the form &XY where X is the foreground
      * code and Y is the background code.
      * @param msg the string that the user wants to print
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
     */
-void print(std::string msg);
+void print(std::string msg, bool colorize_newline = false);
 /**
      * Prints a string to stdout. Overrides any TermPrint
      * color codes found in the text with color passed in
      * by parameter.
      * @param msg the string that the user wants to print
      * @param forecolor the color of the text in the string
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
      */
-void print(std::string msg, unsigned short forecolor);
+void print(std::string msg, unsigned short forecolor, bool colorize_newline = false);
 /**
      * Prints a string to stdout. Overrides any TermPrint
      * color codes found in the text with color passed in
@@ -94,29 +99,31 @@ void print(std::string msg, unsigned short forecolor);
      * @param msg the string that the user wants to print
      * @param forecolor the color of the text in the string
      * @param backcolor the color behind the text in the string
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
      */
-void print(std::string msg, unsigned short forecolor, unsigned short backcolor);
+void print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline = false);
 
 void clear();
 
 /**
-     * Fuses two multi-line string together for printing side-by-side
-     * @param left the string that will be on the left half of the fused string
-     * @param right the string that will be on the right half of the fused string
-     */
+ * Fuses two multi-line string together for printing side-by-side
+ * @param left the string that will be on the left half of the fused string
+ * @param right the string that will be on the right half of the fused string
+ */
 std::string fuse(std::string left, std::string right);
 /**
-     * Fuses two multi-line string together for printing side-by-side
-     * @param left the string that will be on the left half of the fused string
-     * @param right the string that will be on the right half of the fused string
-     * @param pad bool, whether to pad each line of the string to be the same width
-     */
+ * Fuses two multi-line string together for printing side-by-side
+ * @param left the string that will be on the left half of the fused string
+ * @param right the string that will be on the right half of the fused string
+ * @param pad bool, whether to pad each line of the string to be the same width
+ */
 std::string fuse(std::string left, std::string right, bool pad);
 /**
-     * Split a string and store each new substring in a vector.
-     * @param text the original string
-     * @param delim the delimiting character to split by
-     */
+ * Split a string and store each new substring in a vector.
+ * @param text the original string
+ * @param delim the delimiting character to split by
+ */
 std::vector<std::string> splitstring(std::string text, char delim);
 
 /**
@@ -143,16 +150,16 @@ static HANDLE _active_terminal;
 
 #if defined(WINDOWS)
 /**
-     * Instead of making a #if every time a string shows up and making the
-     * string a wide string if we're on Windows, we can overload the <<
-     * operator to work with wostreams and strings so lines like:
-     * wcout << "Hello World!";
-     * will actually work. We're just going to convert the input string
-     * into a wstring.
-     * @param out the wide ostream to be output to
-     * @param text the text to be converted to a wstring
-     * @return the same ostream being used (for chaining output statements)
-     */
+ * Instead of making a #if every time a string shows up and making the
+ * string a wide string if we're on Windows, we can overload the <<
+ * operator to work with wostreams and strings so lines like:
+ * wcout << "Hello World!";
+ * will actually work. We're just going to convert the input string
+ * into a wstring.
+ * @param out the wide ostream to be output to
+ * @param text the text to be converted to a wstring
+ * @return the same ostream being used (for chaining output statements)
+ */
 std::wostream &operator<<(std::wostream &out, std::string text);
 #endif
 
@@ -333,8 +340,10 @@ void TermGame::sleep(unsigned int ms)
  * color codes of the form &XY where X is the foreground
  * code and Y is the background code.
  * @param msg the string that the user wants to print
+ * @param colorize_newline should newlines have color applied to them? It can
+ * create very strange effects if enabled.
  */
-void TermPrint::print(std::string msg)
+void TermPrint::print(std::string msg, bool colorize_newline)
 {
     // Internal colors mapped in an array in order of the
     // public facing color codes.
@@ -348,6 +357,21 @@ void TermPrint::print(std::string msg)
         _CYAN,
         _MAGENTA,
         _WHITE};
+    /**
+     * If we aren't coloring newlines, we need to ensure every newline includes
+     * a &00 indicating that it should be reset.
+     */
+    if (!colorize_newline)
+    {
+        size_t start_pos = 0;
+        std::string old = "\n";
+        std::string repl = "&00\n";
+        while ((start_pos = msg.find(old, start_pos)) != std::string::npos)
+        {
+            msg.replace(start_pos, old.length(), repl);
+            start_pos += repl.length(); // Handles case where 'to' is a substring of 'from'
+        }
+    }
     // split the strings by the color code delimeter '&'
     std::vector<std::string> strings = splitstring(msg, '&');
 #if defined(WINDOWS)
@@ -418,12 +442,12 @@ void TermPrint::print(std::string msg)
  * @param msg the string that the user wants to print
  * @param forecolor the color of the text in the string
  */
-void TermPrint::print(std::string msg, unsigned short forecolor)
+void TermPrint::print(std::string msg, unsigned short forecolor, bool colorize_newline)
 {
 #if defined(WINDOWS)
-    print(msg, forecolor, _BLACK);
+    print(msg, forecolor, _BLACK, colorize_newline);
 #else
-    print(msg, forecolor, _RESET_COLOR);
+    print(msg, forecolor, _RESET_COLOR, colorize_newline);
 #endif
 }
 /**
@@ -434,7 +458,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor)
  * @param forecolor the color of the text in the string
  * @param backcolor the color behind the text in the string
  */
-void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short backcolor)
+void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline)
 {
     // Internal colors mapped in an array in order of the
     // public facing color codes.
@@ -450,33 +474,48 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         _WHITE};
     forecolor = _COLORS[forecolor];
     backcolor = _COLORS[backcolor];
-#if defined(WINDOWS)
-    // If we're using windows and it has not yet been fixed
-    if (!_winFix)
+    /**
+     * If we aren't coloring newlines, we need to ensure every newline resets the color
+     */
+    std::vector<std::string> msgs;
+    if (!colorize_newline)
     {
-        // set the console mode for unicode
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        // We must have a reference to the active terminal for Windows' color API
-        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Mark the Windows fix as complete
-        _winFix = true;
+        msgs = splitstring(msg, '\n');
     }
-    // Color the console based on the arguments
-    // Win API color codes are of the form 0xXY
-    // X is a hex digit in the 16's place (multiples of 16)
-    // representing the background color. Y is a hex digit in the
-    // 1's place (multiples of 1) representing the text color. Hence,
-    // the addition below which generates a base 10 equivalent.
-    SetConsoleTextAttribute(_active_terminal, (16 * backcolor) + forecolor);
-    std::wcout << msg;
-    SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
+    for (int i = 0; i < msgs.size(); i++)
+    {
+#if defined(WINDOWS)
+        // If we're using windows and it has not yet been fixed
+        if (!_winFix)
+        {
+            // set the console mode for unicode
+            _setmode(_fileno(stdout), _O_U16TEXT);
+            // We must have a reference to the active terminal for Windows' color API
+            _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+            // Mark the Windows fix as complete
+            _winFix = true;
+        }
+        // Color the console based on the arguments
+        // Win API color codes are of the form 0xXY
+        // X is a hex digit in the 16's place (multiples of 16)
+        // representing the background color. Y is a hex digit in the
+        // 1's place (multiples of 1) representing the text color. Hence,
+        // the addition below which generates a base 10 equivalent.
+        SetConsoleTextAttribute(_active_terminal, (16 * backcolor) + forecolor);
+        std::wcout << msgs[i];
+        SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
+        if(msg.find('\n') > 1)
+            std::wcout << "\n";
 #else
-    // This will all run if we are using *nix
-    // print the color code for foreground and add 10 to convert foreground colors to background
-    std::cout << "\033[" + std::to_string(forecolor) << ';' << std::to_string(backcolor + 10) << 'm';
-    std::cout << msg;
-    std::cout << "\033[" + std::to_string(_RESET_COLOR) << ';' << std::to_string(_RESET_COLOR + 10) << 'm';
+        // This will all run if we are using *nix
+        // print the color code for foreground and add 10 to convert foreground colors to background
+        std::cout << "\033[" + std::to_string(forecolor) << ';' << std::to_string(backcolor + 10) << 'm';
+        std::cout << msgs[i];
+        std::cout << "\033[" + std::to_string(_RESET_COLOR) << ';' << std::to_string(_RESET_COLOR + 10) << 'm';
+        if(msg.find('\n') > 1)
+            std::cout << '\n';
 #endif
+    }
 }
 
 void TermPrint::clear()
