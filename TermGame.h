@@ -36,8 +36,8 @@
 namespace TermGame
 {
 /**
- * Gets a single character from stdin without need for a newline buffer.
- * (No need to press enter/return to finish input)
+ * Gets a single character from stdin without need for a newline buffer. (No
+ * need to press enter/return to finish input)
  * @return char  the character entered
  */
 char getch();
@@ -63,8 +63,8 @@ void sleep(unsigned int ms);
 namespace TermPrint
 {
 /**
- * TermPrint color codes stored as string objects for easy use.
- * The codes will also be documented on the repository.
+ * TermPrint color codes stored as string objects for easy use. The codes will
+ * also be documented on the repository.
  */
 static const unsigned short DEFAULT = 0;
 static const unsigned short BLACK = 1;
@@ -77,28 +77,27 @@ static const unsigned short MAGENTA = 7;
 static const unsigned short WHITE = 8;
 
 /**
- * Prints a string to stdout. Interprets any TermPrint
- * color codes of the form &XY where X is the foreground
- * code and Y is the background code.
+ * Prints a string to stdout. Interprets any TermPrint color codes of the form
+ * &XY where X is the foreground code and Y is the background code.
  * @param msg the string that the user wants to print
  * @param colorize_newline should newlines have color applied to them? It can
  * create very strange effects if enabled.
 */
 void print(std::string msg, bool colorize_newline = false);
+
 /**
- * Prints a string to stdout. Overrides any TermPrint
- * color codes found in the text with color passed in
- * by parameter.
+ * Prints a string to stdout. Overrides any TermPrint color codes found in the
+ * text with color passed in by parameter.
  * @param msg the string that the user wants to print
  * @param forecolor the color of the text in the string
  * @param colorize_newline should newlines have color applied to them? It can
  * create very strange effects if enabled.
  */
 void print(std::string msg, unsigned short forecolor, bool colorize_newline = false);
+
 /**
- * Prints a string to stdout. Overrides any TermPrint
- * color codes found in the text with color passed in
- * by parameter.
+ * Prints a string to stdout. Overrides any TermPrint color codes found in the
+ * text with color passed in by parameter.
  * @param msg the string that the user wants to print
  * @param forecolor the color of the text in the string
  * @param backcolor the color behind the text in the string
@@ -116,8 +115,10 @@ void clear();
  * Fuses two multi-line string together for printing side-by-side
  * @param left the string that will be on the left half of the fused string
  * @param right the string that will be on the right half of the fused string
+ * @return std::string containing both of the original strings side-by-side
  */
 std::string fuse(std::string left, std::string right);
+
 /**
  * Fuses two multi-line string together for printing side-by-side
  * @param left the string that will be on the left half of the fused string
@@ -125,6 +126,7 @@ std::string fuse(std::string left, std::string right);
  * @param pad bool, whether to pad each line of the string to be the same width
  */
 std::string fuse(std::string left, std::string right, bool pad);
+
 /**
  * Split a string and store each new substring in a vector.
  * @param text the original string
@@ -237,11 +239,6 @@ public:
  *   |_|\___|_| |_|_|_\___\__,_|_|_|_\___| |_| \_,_|_||_\__|\__|_\___/_||_/__/
  */
 
-/**
- * Gets a single character from stdin without need for a newline buffer.
- * (No need to press enter/return to finish input)
- * @return char  the character entered
- */
 char TermGame::getch()
 {
 #if defined(WINDOWS)
@@ -260,15 +257,6 @@ char TermGame::getch()
 #endif
 }
 
-/**
- * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters
- * depending on the user's platform.
- * @return std::string  a string containing one of four values that
- * represent which arrow key was pressed. "ARROW_UP", "ARROW_DOWN",
- * "ARROW_LEFT", "ARROW_RIGHT"
- * @exception std::runtime_error  exception is thrown any time a non-arrow
- * key is pressed in response to this function
- */
 std::string TermGame::getarrow()
 {
     char key;
@@ -342,14 +330,6 @@ void TermGame::sleep(unsigned int ms)
  *   |_|\___|_| |_|_|_|_| |_| |_|_||_\__| |_| \_,_|_||_\__|\__|_\___/_||_/__/
  */
 
-/**
- * Prints a string to stdout. Interprets any TermPrint
- * color codes of the form &XY where X is the foreground
- * code and Y is the background code.
- * @param msg the string that the user wants to print
- * @param colorize_newline should newlines have color applied to them? It can
- * create very strange effects if enabled.
- */
 void TermPrint::print(std::string msg, bool colorize_newline)
 {
     // Internal colors mapped in an array in order of the
@@ -442,13 +422,7 @@ void TermPrint::print(std::string msg, bool colorize_newline)
     std::cout << "\033[" + std::to_string(_RESET_COLOR) << ';' << std::to_string(_RESET_COLOR + 10) << 'm';
 #endif
 }
-/**
- * Prints a string to stdout. Overrides any TermPrint
- * color codes found in the text with color passed in
- * by parameter.
- * @param msg the string that the user wants to print
- * @param forecolor the color of the text in the string
- */
+
 void TermPrint::print(std::string msg, unsigned short forecolor, bool colorize_newline)
 {
 #if defined(WINDOWS)
@@ -457,14 +431,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, bool colorize_n
     print(msg, forecolor, _RESET_COLOR, colorize_newline);
 #endif
 }
-/**
- * Prints a string to stdout. Overrides any TermPrint
- * color codes found in the text with color passed in
- * by parameter.
- * @param msg the string that the user wants to print
- * @param forecolor the color of the text in the string
- * @param backcolor the color behind the text in the string
- */
+
 void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline)
 {
     // Internal colors mapped in an array in order of the
@@ -536,23 +503,11 @@ void TermPrint::clear()
 #endif
 }
 
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
- * @return a std::string, with both original strings side-by-side
- */
 std::string TermPrint::fuse(std::string left, std::string right)
 {
     return fuse(left, right, false);
 }
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
- * @param pad bool, whether to pad each line of the string to be the same width
- * @return a std::string, with both original strings side-by-side
- */
+
 std::string TermPrint::fuse(std::string left, std::string right, bool pad)
 {
     std::string result = "";
@@ -610,11 +565,7 @@ std::string TermPrint::fuse(std::string left, std::string right, bool pad)
     }
     return result;
 }
-/**
- * Split a string and store each new substring in a vector.
- * @param text the original string
- * @param delim the delimiting character to split by
- */
+
 std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
 {
     std::vector<std::string> strings;
@@ -630,17 +581,6 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
 }
 
 #if defined(WINDOWS)
-/**
-     * Instead of making a #if every time a string shows up and making the
-     * string a wide string if we're on Windows, we can overload the <<
-     * operator to work with wostreams and strings so lines like:
-     * wcout << "Hello World!";
-     * will actually work. We're just going to convert the input string
-     * into a wstring.
-     * @param out the wide ostream to be output to
-     * @param text the text to be converted to a wstring
-     * @return the same ostream being used (for chaining output statements)
-     */
 std::wostream &TermPrint::operator<<(std::wostream &out, std::string text)
 {
     /**
@@ -674,9 +614,6 @@ TermError::KeyPressError::KeyPressError(std::string what_message)
     this->what_message = what_message;
 }
 
-/**
- * Get the error message associated with the KeyPressError exception.
- */
 const char *TermError::KeyPressError::what() const throw()
 {
     return what_message.c_str();
