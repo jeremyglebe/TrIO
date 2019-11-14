@@ -4,7 +4,6 @@
 #define WINDOWS true
 #endif
 // Included libraries
-#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string>
