@@ -36,23 +36,26 @@
 namespace TermGame
 {
 /**
-     * Gets a single character from stdin without need for a newline buffer.
-     * (No need to press enter/return to finish input)
-     * @return char  the character entered
-     */
+ * Gets a single character from stdin without need for a newline buffer.
+ * (No need to press enter/return to finish input)
+ * @return char  the character entered
+ */
 char getch();
 
 /**
-     * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters
-     * depending on the user's platform.
-     * @return std::string  a string containing one of four values that
-     * represent which arrow key was pressed. "ARROW_UP", "ARROW_DOWN",
-     * "ARROW_LEFT", "ARROW_RIGHT"
-     * @exception KeyPressError  exception is thrown any time a non-arrow key
-     * is pressed in response to this function
-     */
+ * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters depending
+ * on the user's platform.
+ * @return a std::string containing one of four values that represent which
+ * arrow key was pressed. "ARROW_UP", "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT"
+ * @exception KeyPressError is thrown any time a non-arrow key is pressed in
+ * response to this function
+ */
 std::string getarrow();
 
+/**
+ * Pauses the program for some time before continuing.
+ * @param ms the time to pause in miliseconds (1000th of a second)
+ */
 void sleep(unsigned int ms);
 
 } // namespace TermGame
@@ -60,9 +63,9 @@ void sleep(unsigned int ms);
 namespace TermPrint
 {
 /**
-     * TermPrint color codes stored as string objects for easy use.
-     * The codes will also be documented on the repository.
-     */
+ * TermPrint color codes stored as string objects for easy use.
+ * The codes will also be documented on the repository.
+ */
 static const unsigned short DEFAULT = 0;
 static const unsigned short BLACK = 1;
 static const unsigned short RED = 2;
@@ -74,36 +77,39 @@ static const unsigned short MAGENTA = 7;
 static const unsigned short WHITE = 8;
 
 /**
-     * Prints a string to stdout. Interprets any TermPrint
-     * color codes of the form &XY where X is the foreground
-     * code and Y is the background code.
-     * @param msg the string that the user wants to print
-     * @param colorize_newline should newlines have color applied to them? It can
-     * create very strange effects if enabled.
-    */
+ * Prints a string to stdout. Interprets any TermPrint
+ * color codes of the form &XY where X is the foreground
+ * code and Y is the background code.
+ * @param msg the string that the user wants to print
+ * @param colorize_newline should newlines have color applied to them? It can
+ * create very strange effects if enabled.
+*/
 void print(std::string msg, bool colorize_newline = false);
 /**
-     * Prints a string to stdout. Overrides any TermPrint
-     * color codes found in the text with color passed in
-     * by parameter.
-     * @param msg the string that the user wants to print
-     * @param forecolor the color of the text in the string
-     * @param colorize_newline should newlines have color applied to them? It can
-     * create very strange effects if enabled.
-     */
+ * Prints a string to stdout. Overrides any TermPrint
+ * color codes found in the text with color passed in
+ * by parameter.
+ * @param msg the string that the user wants to print
+ * @param forecolor the color of the text in the string
+ * @param colorize_newline should newlines have color applied to them? It can
+ * create very strange effects if enabled.
+ */
 void print(std::string msg, unsigned short forecolor, bool colorize_newline = false);
 /**
-     * Prints a string to stdout. Overrides any TermPrint
-     * color codes found in the text with color passed in
-     * by parameter.
-     * @param msg the string that the user wants to print
-     * @param forecolor the color of the text in the string
-     * @param backcolor the color behind the text in the string
-     * @param colorize_newline should newlines have color applied to them? It can
-     * create very strange effects if enabled.
-     */
+ * Prints a string to stdout. Overrides any TermPrint
+ * color codes found in the text with color passed in
+ * by parameter.
+ * @param msg the string that the user wants to print
+ * @param forecolor the color of the text in the string
+ * @param backcolor the color behind the text in the string
+ * @param colorize_newline should newlines have color applied to them? It can
+ * create very strange effects if enabled.
+ */
 void print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline = false);
 
+/**
+ * Clears the terminal of text.
+ */
 void clear();
 
 /**
@@ -123,6 +129,7 @@ std::string fuse(std::string left, std::string right, bool pad);
  * Split a string and store each new substring in a vector.
  * @param text the original string
  * @param delim the delimiting character to split by
+ * @return std::vector containing each substring
  */
 std::vector<std::string> splitstring(std::string text, char delim);
 
@@ -504,7 +511,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         SetConsoleTextAttribute(_active_terminal, (16 * backcolor) + forecolor);
         std::wcout << msgs[i];
         SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
-        if(msg.find('\n') > 1)
+        if (msg.find('\n') > 1)
             std::wcout << "\n";
 #else
         // This will all run if we are using *nix
@@ -512,7 +519,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         std::cout << "\033[" + std::to_string(forecolor) << ';' << std::to_string(backcolor + 10) << 'm';
         std::cout << msgs[i];
         std::cout << "\033[" + std::to_string(_RESET_COLOR) << ';' << std::to_string(_RESET_COLOR + 10) << 'm';
-        if(msg.find('\n') > 1)
+        if (msg.find('\n') > 1)
             std::cout << '\n';
 #endif
     }
