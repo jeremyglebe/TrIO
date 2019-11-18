@@ -477,7 +477,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         SetConsoleTextAttribute(_active_terminal, (16 * backcolor) + forecolor);
         std::wcout << msgs[i];
         SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _WHITE);
-        if (msg.find('\n') > 1)
+        if (msg.find('\n') != std::string::npos)
             std::wcout << "\n";
 #else
         // This will all run if we are using *nix
