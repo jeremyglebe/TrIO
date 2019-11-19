@@ -15,13 +15,13 @@ int main()
 {
     TP::print("\n[TEST UNBUFFERED INPUT]\n");
     // test getting a single character from stdin
-    cout << "Press any key:\n";
-    cout << TG::getch() << endl;
+    TP::print("Press any key:\n");
+    TP::print(TG::getch() + string(1,'\n'));
     // test getting arrow keys
-    cout << "Press 4 Arrow Keys:\n";
+    TP::print("Press 4 Arrow Keys:\n");
     for (int i = 0; i < 4; i++)
     {
-        cout << TG::getarrow() << endl;
+        TP::print(TG::getarrow() + '\n');
     }
 
     // test splitting strings

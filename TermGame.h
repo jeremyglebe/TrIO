@@ -427,6 +427,16 @@ void TermPrint::print(std::string msg, bool colorize_newline)
     // split the strings by the color code delimeter '&'
     std::vector<std::string> strings = splitstring(msg, '&');
 #if defined(WINDOWS)
+    // If we're using windows and it has not yet been fixed
+    if (!_winFix)
+    {
+        // set the console mode for unicode
+        _setmode(_fileno(stdout), _O_U16TEXT);
+        // We must have a reference to the active terminal for Windows' color API
+        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+        // Mark the Windows fix as complete
+        _winFix = true;
+    }
     std::wcout << strings[0];
     for (int i = 1; i < strings.size(); i++)
     {
@@ -446,13 +456,15 @@ void TermPrint::print(std::string msg, bool colorize_newline)
                 // Remove the color codes from the string
                 strings[i].erase(0, 2);
                 // Now lets actually use those color codes
-                if (_COLORS[bg_code] != 0)
+                // On Windows the defined "_RESET_COLOR" is black, which only applies to the background
+                // We need to replace FG uses of RESET_COLOR with white.
+                if (fg_code != 0)
                 {
                     SetConsoleTextAttribute(_active_terminal, (16 * _COLORS[bg_code]) + _COLORS[fg_code]);
                 }
                 else
                 {
-                    SetConsoleTextAttribute(_active_terminal, (16 * _BLACK) + _COLORS[fg_code]);
+                    SetConsoleTextAttribute(_active_terminal, (16 * _COLORS[bg_code]) + _WHITE);
                 }
             }
             std::wcout << strings[i];
