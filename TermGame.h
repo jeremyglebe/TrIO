@@ -34,6 +34,16 @@
 
 namespace TermGame
 {
+
+/**
+ * Gets a single key from the keyboard, attempting to look for special
+ * character sequences indicating an arrow key.
+ * @return a std::string containing either a single character (from the key
+ * that was pressed) or a code indicating an arrow key ("ARROW_UP",
+ * "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT")
+ */
+std::string getkey();
+
 /**
  * Gets a single character from stdin without need for a newline buffer. (No
  * need to press enter/return to finish input)
@@ -310,6 +320,62 @@ std::string TermGame::getarrow()
     std::string error_msg = "KeyPressError: Non-arrow key pressed in response ";
     error_msg += "to TermGame::getarrow()";
     throw TermError::KeyPressError(error_msg);
+}
+
+std::string TermGame::getkey()
+{
+    char key;
+#if defined(WINDOWS)
+    // On windows, arrow keys start with a char, value 0
+    key = getch();
+    if (key == 0)
+    {
+        // The follow-up character determines which arrow key was pressed
+        key = getch();
+        if (key == 77)
+            return "ARROW_RIGHT";
+        else if (key == 72)
+        {
+            return "ARROW_UP";
+        }
+        else if (key == 75)
+        {
+            return "ARROW_LEFT";
+        }
+        else if (key == 80)
+        {
+            return "ARROW_DOWN";
+        }
+    }
+#else
+    // *nix systems work like the Windows version above, only arrow keys here
+    // start with 2 characters, values 27 and 91, followed by a character to
+    // distinguish between arrows.
+    key = getch();
+    if (key == 27)
+    {
+        if (getch() == 91)
+        {
+            key = getch();
+            if (key == 67)
+                return "ARROW_RIGHT";
+            else if (key == 65)
+            {
+                return "ARROW_UP";
+            }
+            else if (key == 68)
+            {
+                return "ARROW_LEFT";
+            }
+            else if (key == 66)
+            {
+                return "ARROW_DOWN";
+            }
+        }
+    }
+#endif
+    // If no special sequence was entered, just return the value of key.
+    return string(1, key);
 }
 
 void TermGame::sleep(unsigned int ms)
