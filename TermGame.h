@@ -375,7 +375,7 @@ std::string TermGame::getkey()
     }
 #endif
     // If no special sequence was entered, just return the value of key.
-    return string(1, key);
+    return std::string(1, key);
 }
 
 void TermGame::sleep(unsigned int ms)
