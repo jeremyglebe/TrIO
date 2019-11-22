@@ -563,7 +563,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         std::cout << "\033[" + std::to_string(forecolor) << ';' << std::to_string(backcolor + 10) << 'm';
         std::cout << msgs[i];
         std::cout << "\033[" + std::to_string(_RESET_COLOR) << ';' << std::to_string(_RESET_COLOR + 10) << 'm';
-        if (msg.find('\n') > 1)
+        if (msg.find('\n') != std::string::npos)
             std::cout << '\n';
 #endif
     }
