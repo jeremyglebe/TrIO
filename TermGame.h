@@ -18,6 +18,7 @@
 #else
 // Libraries only used by non-Windows
 #include <unistd.h>
+#include <sstream>
 #endif
 
 /*
@@ -143,6 +144,13 @@ std::string fuse(std::string left, std::string right, bool pad);
  * @return std::vector containing each substring
  */
 std::vector<std::string> splitstring(std::string text, char delim);
+
+/**
+ * Moves the terminal's cursor to the passed in position
+ * @param X the x-coordinate value to move the cursor to
+ * @param Y the y-coordinate value to move the cursor to
+ */
+void moveCursor(short X, short Y);
 
 /**
  *   _____ _______ ____  _____  _ 
@@ -655,6 +663,24 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
         text.erase(0, i + 1);
     }
     return strings;
+}
+
+void TermPrint::moveCursor(short X, short Y)
+{
+#if defined(WINDOWS)
+    // if using Windows, use windows.h
+    // We must have a reference to the active terminal for Windows
+    HANDLE thisConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD cor = {X, Y};
+    SetConsoleCursorPosition(thisConsole, cor);
+#else
+    // on *nix use ANSI escape
+    //use string stream here as the easiest way to convert int
+    //to hex, trying to send out one at a time produces weird results
+    std::stringstream cursor;
+    cursor << "\033[" << std::hex << X << ';' << std::hex << Y << 'H';
+    std::cout << cursor.str();
+#endif
 }
 
 #if defined(WINDOWS)
