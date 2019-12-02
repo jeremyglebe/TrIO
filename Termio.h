@@ -6,6 +6,7 @@
 // Include for all platforms
 #include <chrono>
 #include <iostream>
+#include <regex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -36,18 +37,22 @@ string fuse(string left, string right, bool pad);
  * Split a string and store each new substring in a vector.
  * @param text the original string
  * @param delim the delimiting character to split by
+ * @param include determines if the delimeter should be included in the
+ * returned substrings
  * @return vector containing each substring
  */
-vector<string> split(string text, char delim);
+vector<string> split(string text, char delim, bool include = false);
 
 /**
  * Split a string, using a regular expression as a delimeter, and store
  * each new substring in a vector.
  * @param text the original string
  * @param delim the regular expression to match and split by
+ * @param include determines if the delimeter should be included in the
+ * returned substrings
  * @return vector containing each substring
  */
-vector<string> rsplit(string text, string delim);
+vector<string> rsplit(string text, string delim, bool include = false);
 
 /**
  * A Point object is used to move the cursor on the terminal.
@@ -182,6 +187,66 @@ private:
 } // namespace Term
 
 /*
+ *  _____                 _                           _        _   _                 
+ * |_   _|               | |                         | |      | | (_)                
+ *   | |  _ __ ___  _ __ | | ___ _ __ ___   ___ _ __ | |_ __ _| |_ _  ___  _ __  ___ 
+ *   | | | '_ ` _ \| '_ \| |/ _ \ '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \/ __|
+ *  _| |_| | | | | | |_) | |  __/ | | | | |  __/ | | | || (_| | |_| | (_) | | | \__ \
+ * |_____|_| |_| |_| .__/|_|\___|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|___/
+ *                 | |                                                               
+ *                 |_|                                                               
+ */
+
+/*
+IMPLEMENTATIONS FOR HELPER FUNCTIONS
+*/
+
+// Just calls the regular expression split but delimeter does not have to be
+// a regular expression
+std::vector<std::string> Term::split(string text, char delim, bool include)
+{
+    return rsplit(text, string(1, delim), include);
+}
+
+// Part of the rsplit() implementation came from Stack Overflow user Marcin,
+// see the following post:
+// https://stackoverflow.com/questions/16749069/c-split-string-by-regex
+std::vector<std::string> Term::rsplit(string text, string delim, bool include)
+{
+    std::vector<std::string> elems;
+    std::regex rgx(delim);
+    // Find parts of the string which do not match the regexp and append them
+    // to the vector
+    std::sregex_token_iterator iter(text.begin(), text.end(), rgx, -1);
+    std::sregex_token_iterator end;
+    while (iter != end)
+    {
+        elems.push_back(*(iter));
+        ++iter;
+    }
+
+    // If we want to include the delimeter, then we need to go re-add it to
+    // the beginning of each line.
+    if (include)
+    {
+        std::sregex_token_iterator iter(text.begin(), text.end(), rgx, 0);
+        std::sregex_token_iterator end;
+
+        int i = 0;
+        while (iter != end)
+        {
+            string temp = elems[i+1];
+            elems[i+1] = *iter;
+            elems[i+1] += temp;
+            ++iter;
+            i++;
+        }
+    }
+
+    return elems;
+}
+
+/*
 IMPLEMENTATIONS FOR COMMANDS
 */
 Term::Sleep::Sleep(const unsigned int &ms)
@@ -197,6 +262,12 @@ void Term::Sleep::call()
 /*
 IMPLEMENTATIONS FOR IO
 */
+
+Term::IO::IO()
+{
+    return;
+}
+
 Term::IO &Term::IO::operator<<(string text)
 {
     // Reset the color on every new line, easiest way to do this is just to
@@ -207,20 +278,31 @@ Term::IO &Term::IO::operator<<(string text)
     while ((start_pos = text.find(old, start_pos)) != string::npos)
     {
         text.replace(start_pos, old.length(), repl);
-        start_pos += repl.length(); // Handles case where 'to' is a substring of 'from'
+        start_pos += repl.length();
     }
-    
-    // Split the strings by color escape character, '&'
-    // The results of this splitting can be somewhat complicated to interpret.
-    // For the most part, it looks like this:
-    // "&41Hello World!&03 && also goodbye...&00\n"
-    // will become
-    // ["", "41Hello World!", "03 ", "", " also goodbye...", "00\n"]
-    // Note that "" is where our literal '&' should be. This means we want to
-    // actually print a '&' instead of an escape.
-    // Still not that simple though, you also have a "" at the beginning
-    // because of the first escape sequence...
-    vector<string> strings = split(text, '&');
 
-    // CODE IS NOT FINISHED
+    // Replace every instance of "&&" with, where X represents an
+    // invisible non-printable, "&X". We will later ignore X when printing
+    start_pos = 0;
+    old = "&&";
+    repl = '&' + string(1, char(0));
+    while ((start_pos = text.find(old, start_pos)) != string::npos)
+    {
+        text.replace(start_pos, old.length(), repl);
+        start_pos += repl.length();
+    }
+
+    // Split the string by "&XY" with X and Y as numeric color codes
+    vector<string>
+        strings = rsplit(text, "&[0-8][0-8]", true);
+
+    // Debugging, print out the split lines to help understand how the string
+    // is split.
+    for (int i = 0; i < strings.size(); i++)
+    {
+        cout << strings[i] << std::endl;
+    }
+
+    // Return this IO object (for any chained outputs)
+    return *this;
 }
