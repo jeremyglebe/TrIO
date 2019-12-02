@@ -207,6 +207,7 @@ private:
     ostream *out;
     wostream *wout;
     bool wide;
+    void _set_color(Color c);
 };
 } // namespace Term
 
@@ -354,6 +355,9 @@ Term::IO &Term::IO::operator<<(string text)
 
         // Set the color based on the first 3 characters of each substring
         // (Make sure the substring contains a color code, it may be "")
+#if defined(WINDOWS)
+#else
+#endif
 
         // Print the line, using either a wide or narrow stream
         if (wide)
@@ -374,4 +378,15 @@ Term::IO &Term::IO::operator<<(string text)
 
     // Return this IO object (for any chained outputs)
     return *this;
+}
+
+void Term::IO::_set_color(Color c)
+{
+#if defined(WINDOWS)
+    static const unsigned short _fg[] = {7, 0, 4, 6, 2, 1, 3, 5, 7};
+    static const unsigned short _bg[] = {0, 0, 64, 96, 32, 16, 48, 80, 112};
+#else
+    static const unsigned short _fg[] = {39, 30, 31, 33, 32, 34, 36, 35, 37};
+    static const unsigned short _bg[] = {49, 40, 41, 43, 42, 44, 46, 45, 47};
+#endif
 }
