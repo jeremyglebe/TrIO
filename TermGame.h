@@ -169,7 +169,7 @@ void moveCursor(short X, short Y);
 
 #if defined(WINDOWS)
 // Windows fix bool.
-static bool _winFix;
+static bool _winFixed = false;
 // We must have a reference to the active terminal for Windows' color API
 static HANDLE _active_terminal;
 #endif
@@ -187,6 +187,21 @@ static HANDLE _active_terminal;
  * @return the same ostream being used (for chaining output statements)
  */
 std::wostream &operator<<(std::wostream &out, std::string text);
+#endif
+
+#if defined(WINDOWS)
+void fixWin(){
+    // If we're using windows and it has not yet been fixed
+    if (!_winFixed)
+    {
+        // set the console mode for unicode
+        _setmode(_fileno(stdout), _O_U16TEXT);
+        // We must have a reference to the active terminal for Windows' color API
+        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+        // Mark the Windows fix as complete
+        _winFixed = true;
+    }
+}
 #endif
 
 /**
@@ -215,6 +230,7 @@ static const unsigned short _CYAN = 36;
 static const unsigned short _WHITE = 37;
 static const unsigned short _RESET_COLOR = 39;
 #endif
+
 } // namespace TermPrint
 
 /**
@@ -436,14 +452,10 @@ void TermPrint::print(std::string msg, bool colorize_newline)
     std::vector<std::string> strings = splitstring(msg, '&');
 #if defined(WINDOWS)
     // If we're using windows and it has not yet been fixed
-    if (!_winFix)
+    if (!_winFixed)
     {
-        // set the console mode for unicode
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        // We must have a reference to the active terminal for Windows' color API
-        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Mark the Windows fix as complete
-        _winFix = true;
+        // fix Windows
+        fixWin();
     }
     std::wcout << strings[0];
     for (int i = 1; i < strings.size(); i++)
@@ -545,14 +557,10 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
     {
 #if defined(WINDOWS)
         // If we're using windows and it has not yet been fixed
-        if (!_winFix)
+        if (!_winFixed)
         {
-            // set the console mode for unicode
-            _setmode(_fileno(stdout), _O_U16TEXT);
-            // We must have a reference to the active terminal for Windows' color API
-            _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-            // Mark the Windows fix as complete
-            _winFix = true;
+            // fix Windows
+            fixWin();
         }
         // Color the console based on the arguments
         // Win API color codes are of the form 0xXY
@@ -668,11 +676,13 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
 void TermPrint::moveCursor(short X, short Y)
 {
 #if defined(WINDOWS)
+    if(!_winFixed){
+        fixWin();
+    }
     // if using Windows, use windows.h
     // We must have a reference to the active terminal for Windows
-    HANDLE thisConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD cor = {X, Y};
-    SetConsoleCursorPosition(thisConsole, cor);
+    SetConsoleCursorPosition(_active_terminal, cor);
 #else
     // on *nix use ANSI escape
     //use string stream here as the easiest way to convert int
