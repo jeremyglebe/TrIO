@@ -1,3 +1,9 @@
+#pragma once
+// Define whether we are using Windows
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define WINDOWS true
+#endif
+// Include for all platforms
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -32,7 +38,16 @@ string fuse(string left, string right, bool pad);
  * @param delim the delimiting character to split by
  * @return vector containing each substring
  */
-vector<string> splitstring(string text, char delim);
+vector<string> split(string text, char delim);
+
+/**
+ * Split a string, using a regular expression as a delimeter, and store
+ * each new substring in a vector.
+ * @param text the original string
+ * @param delim the regular expression to match and split by
+ * @return vector containing each substring
+ */
+vector<string> rsplit(string text, string delim);
 
 /**
  * A Point object is used to move the cursor on the terminal.
@@ -139,7 +154,12 @@ public:
     IO(wostream &wout);
 
     // output operations
-    IO &operator<<(const string &text);
+    /**
+     * Prints a string to the terminal and interprets any color codes found
+     * @param text the string to print to the terminal
+     * @return a reference to this IO object, to account for chained outputs
+     */
+    IO &operator<<(string text);
     IO &operator<<(const char &letter);
     IO &operator<<(const int &number);
     IO &operator<<(const double &number);
@@ -172,4 +192,35 @@ Term::Sleep::Sleep(const unsigned int &ms)
 void Term::Sleep::call()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+/*
+IMPLEMENTATIONS FOR IO
+*/
+Term::IO &Term::IO::operator<<(string text)
+{
+    // Reset the color on every new line, easiest way to do this is just to
+    // replace every '\n' with '&00\n' (using the Termio color escapes)
+    size_t start_pos = 0;
+    string old = "\n";
+    string repl = "&00\n";
+    while ((start_pos = text.find(old, start_pos)) != string::npos)
+    {
+        text.replace(start_pos, old.length(), repl);
+        start_pos += repl.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    
+    // Split the strings by color escape character, '&'
+    // The results of this splitting can be somewhat complicated to interpret.
+    // For the most part, it looks like this:
+    // "&41Hello World!&03 && also goodbye...&00\n"
+    // will become
+    // ["", "41Hello World!", "03 ", "", " also goodbye...", "00\n"]
+    // Note that "" is where our literal '&' should be. This means we want to
+    // actually print a '&' instead of an escape.
+    // Still not that simple though, you also have a "" at the beginning
+    // because of the first escape sequence...
+    vector<string> strings = split(text, '&');
+
+    // CODE IS NOT FINISHED
 }
