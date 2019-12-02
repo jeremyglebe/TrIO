@@ -60,6 +60,15 @@ vector<string> split(string text, char delim, bool include = false);
 vector<string> rsplit(string text, string delim, bool include = false);
 
 /**
+ * Replaces all instances of a substring in a text with a new string.
+ * @param text the main text to replace in
+ * @param from the substring to replace
+ * @param to the new string to replace it with
+ * @return the updated main string
+ */
+string replace_all(string text, string from, string to);
+
+/**
  * It is easier to consistently pass in strings instead of keeping track of
  * wide vs narrow strings. So, we will overload << to make wostreams able to
  * work with strings (by converting them inside the operation to wstring)
@@ -261,6 +270,17 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
     return elems;
 }
 
+std::string Term::replace_all(string text, string from, string to)
+{
+    size_t start_pos = 0;
+    while ((start_pos = text.find(from, start_pos)) != string::npos)
+    {
+        text.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return text;
+}
+
 std::wostream &Term::operator<<(wostream &wout, string text)
 {
     /**
@@ -308,25 +328,11 @@ Term::IO &Term::IO::operator<<(string text)
 {
     // Reset the color on every new line, easiest way to do this is just to
     // replace every '\n' with '&00\n' (using the Termio color escapes)
-    size_t start_pos = 0;
-    string old = "\n";
-    string repl = "&00\n";
-    while ((start_pos = text.find(old, start_pos)) != string::npos)
-    {
-        text.replace(start_pos, old.length(), repl);
-        start_pos += repl.length();
-    }
+    text = replace_all(text, "\n", "&00\n");
 
     // Replace every instance of "&&" with, where X represents an
     // invisible non-printable, "&X". We will later ignore X when printing
-    start_pos = 0;
-    old = "&&";
-    repl = '&' + string(1, char(0));
-    while ((start_pos = text.find(old, start_pos)) != string::npos)
-    {
-        text.replace(start_pos, old.length(), repl);
-        start_pos += repl.length();
-    }
+    text = replace_all(text, "&&", '&' + string(1, char(0)));
 
     // Split the string by "&XY" with X and Y as numeric color codes
     vector<string>
@@ -343,16 +349,8 @@ Term::IO &Term::IO::operator<<(string text)
     for (int i = 0; i < strings.size(); i++)
     {
         // Now that we've finished searching for escapes, we want the "&X"'s
-        // to become just plain '&'. This replace-all code should be familiar
-        // at this point. Maybe move to its own function?
-        start_pos = 0;
-        old = "&" + string(1, char(0));
-        repl = string(1, '&');
-        while ((start_pos = strings[i].find(old, start_pos)) != string::npos)
-        {
-            strings[i].replace(start_pos, old.length(), repl);
-            start_pos += repl.length();
-        }
+        // to become just plain '&'.
+        strings[i] = replace_all(strings[i], "&" + string(1, char(0)), string(1, '&'));
 
         // Set the color based on the first 3 characters of each substring
         // (Make sure the substring contains a color code, it may be "")

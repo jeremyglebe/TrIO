@@ -4,7 +4,7 @@
 int main(){
     std::string s = "";
     s += "&01abc&&&&def\n";
-    s += "H3l&80110\n";
+    s += "H3&80110\n";
     Term::IO io;
     io << s;
 }
