@@ -145,6 +145,13 @@ std::string fuse(std::string left, std::string right, bool pad);
 std::vector<std::string> splitstring(std::string text, char delim);
 
 /**
+ * Moves the terminal's cursor
+ * @param row y-value to move the cursor to
+ * @param column x-value to move the cursor to
+ */
+void moveCursor(short row, short column);
+
+/**
  *   _____ _______ ____  _____  _ 
  *  / ____|__   __/ __ \|  __ \| |
  * | (___    | | | |  | | |__) | |
@@ -161,7 +168,7 @@ std::vector<std::string> splitstring(std::string text, char delim);
 
 #if defined(WINDOWS)
 // Windows fix bool.
-static bool _winFix;
+static bool _winFixed = false;
 // We must have a reference to the active terminal for Windows' color API
 static HANDLE _active_terminal;
 #endif
@@ -179,6 +186,21 @@ static HANDLE _active_terminal;
  * @return the same ostream being used (for chaining output statements)
  */
 std::wostream &operator<<(std::wostream &out, std::string text);
+#endif
+
+#if defined(WINDOWS)
+void fixWin(){
+    // If we're using windows and it has not yet been fixed
+    if (!_winFixed)
+    {
+        // set the console mode for unicode
+        _setmode(_fileno(stdout), _O_U16TEXT);
+        // We must have a reference to the active terminal for Windows' color API
+        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+        // Mark the Windows fix as complete
+        _winFixed = true;
+    }
+}
 #endif
 
 /**
@@ -207,6 +229,7 @@ static const unsigned short _CYAN = 36;
 static const unsigned short _WHITE = 37;
 static const unsigned short _RESET_COLOR = 39;
 #endif
+
 } // namespace TermPrint
 
 /**
@@ -428,14 +451,10 @@ void TermPrint::print(std::string msg, bool colorize_newline)
     std::vector<std::string> strings = splitstring(msg, '&');
 #if defined(WINDOWS)
     // If we're using windows and it has not yet been fixed
-    if (!_winFix)
+    if (!_winFixed)
     {
-        // set the console mode for unicode
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        // We must have a reference to the active terminal for Windows' color API
-        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Mark the Windows fix as complete
-        _winFix = true;
+        // fix Windows
+        fixWin();
     }
     std::wcout << strings[0];
     for (int i = 1; i < strings.size(); i++)
@@ -537,14 +556,10 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
     {
 #if defined(WINDOWS)
         // If we're using windows and it has not yet been fixed
-        if (!_winFix)
+        if (!_winFixed)
         {
-            // set the console mode for unicode
-            _setmode(_fileno(stdout), _O_U16TEXT);
-            // We must have a reference to the active terminal for Windows' color API
-            _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-            // Mark the Windows fix as complete
-            _winFix = true;
+            // fix Windows
+            fixWin();
         }
         // Color the console based on the arguments
         // Win API color codes are of the form 0xXY
@@ -655,6 +670,27 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
         text.erase(0, i + 1);
     }
     return strings;
+}
+
+void TermPrint::moveCursor(short r, short c)
+{
+#if defined(WINDOWS)
+    if(!_winFixed){
+        fixWin();
+    }
+    // if using Windows, use windows.h
+    // We must have a reference to the active terminal for Windows
+    // Coordinates are (x, y). Columns are x, rows are y, so r/c becomes c/r
+    COORD cor = {c, r};
+    SetConsoleCursorPosition(_active_terminal, cor);
+#else
+    // for some reason, row and column in ANSI start at 1, we want it to start at 0
+    r++;
+    c++;
+    // on *nix use ANSI escape
+    std::string pos = "\033[" + std::to_string(r) + ';' + std::to_string(c) + 'f';
+    std::cout << pos;
+#endif
 }
 
 #if defined(WINDOWS)
