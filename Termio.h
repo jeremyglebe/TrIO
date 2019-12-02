@@ -5,6 +5,7 @@
 #endif
 // Include for all platforms
 #include <chrono>
+#include <codecvt>
 #include <iostream>
 #include <regex>
 #include <string>
@@ -14,8 +15,12 @@
 namespace Term
 {
 
-using std::cout, std::wcout, std::ostream, std::wostream;
-using std::string, std::vector;
+using std::cout;
+using std::ostream;
+using std::string;
+using std::vector;
+using std::wcout;
+using std::wostream;
 
 /**
  * Fuses two multi-line string together for printing side-by-side
@@ -53,6 +58,16 @@ vector<string> split(string text, char delim, bool include = false);
  * @return vector containing each substring
  */
 vector<string> rsplit(string text, string delim, bool include = false);
+
+/**
+ * It is easier to consistently pass in strings instead of keeping track of
+ * wide vs narrow strings. So, we will overload << to make wostreams able to
+ * work with strings (by converting them inside the operation to wstring)
+ * @param wout the wide ostream to be output to
+ * @param text the text to be converted to a wstring
+ * @return the same wostream being used (for chaining output statements)
+ */
+std::wostream &operator<<(wostream &wout, string text);
 
 /**
  * A Point object is used to move the cursor on the terminal.
@@ -235,15 +250,30 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
         int i = 0;
         while (iter != end)
         {
-            string temp = elems[i+1];
-            elems[i+1] = *iter;
-            elems[i+1] += temp;
+            string temp = elems[i + 1];
+            elems[i + 1] = *iter;
+            elems[i + 1] += temp;
             ++iter;
             i++;
         }
     }
 
     return elems;
+}
+
+std::wostream &Term::operator<<(wostream &wout, string text)
+{
+    /**
+     * create a string <-> wide string converter
+     * example from stack overflow
+     * std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+     * std::string narrow = converter.to_bytes(wide_utf16_source_string);
+     * std::wstring wide = converter.from_bytes(narrow_utf8_source_string);
+     */
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wide_text = converter.from_bytes(text);
+    wout << wide_text;
+    return wout;
 }
 
 /*
@@ -265,7 +295,13 @@ IMPLEMENTATIONS FOR IO
 
 Term::IO::IO()
 {
-    return;
+#if defined(WINDOWS)
+    wide = true;
+    wout = &wcout;
+#else
+    wide = false;
+    out = &cout;
+#endif
 }
 
 Term::IO &Term::IO::operator<<(string text)
@@ -298,9 +334,44 @@ Term::IO &Term::IO::operator<<(string text)
 
     // Debugging, print out the split lines to help understand how the string
     // is split.
+    // for (int i = 0; i < strings.size(); i++)
+    // {
+    //     cout << strings[i] << std::endl;
+    // }
+
+    // Print each line of the vector
     for (int i = 0; i < strings.size(); i++)
     {
-        cout << strings[i] << std::endl;
+        // Now that we've finished searching for escapes, we want the "&X"'s
+        // to become just plain '&'. This replace-all code should be familiar
+        // at this point. Maybe move to its own function?
+        start_pos = 0;
+        old = "&" + string(1, char(0));
+        repl = string(1, '&');
+        while ((start_pos = strings[i].find(old, start_pos)) != string::npos)
+        {
+            strings[i].replace(start_pos, old.length(), repl);
+            start_pos += repl.length();
+        }
+
+        // Set the color based on the first 3 characters of each substring
+        // (Make sure the substring contains a color code, it may be "")
+
+        // Print the line, using either a wide or narrow stream
+        if (wide)
+        {
+            if (strings[i].size() > 3)
+                *wout << strings[i].substr(3);
+            else
+                *wout << strings[i];
+        }
+        else
+        {
+            if (strings[i].size() > 3)
+                *out << strings[i].substr(3);
+            else
+                *out << strings[i];
+        }
     }
 
     // Return this IO object (for any chained outputs)
