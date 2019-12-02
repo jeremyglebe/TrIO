@@ -146,11 +146,11 @@ std::string fuse(std::string left, std::string right, bool pad);
 std::vector<std::string> splitstring(std::string text, char delim);
 
 /**
- * Moves the terminal's cursor to the passed in position
- * @param X the x-coordinate value to move the cursor to
- * @param Y the y-coordinate value to move the cursor to
+ * Moves the terminal's cursor
+ * @param row y-value to move the cursor to
+ * @param column x-value to move the cursor to
  */
-void moveCursor(short X, short Y);
+void moveCursor(short row, short column);
 
 /**
  *   _____ _______ ____  _____  _ 
@@ -673,7 +673,7 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
     return strings;
 }
 
-void TermPrint::moveCursor(short X, short Y)
+void TermPrint::moveCursor(short r, short c)
 {
 #if defined(WINDOWS)
     if(!_winFixed){
@@ -681,14 +681,17 @@ void TermPrint::moveCursor(short X, short Y)
     }
     // if using Windows, use windows.h
     // We must have a reference to the active terminal for Windows
-    COORD cor = {X, Y};
+    COORD cor = {r, c};
     SetConsoleCursorPosition(_active_terminal, cor);
 #else
+    // for some reason, row and column in ANSI start at 1, we want it to start at 0
+    r++;
+    c++;
     // on *nix use ANSI escape
     //use string stream here as the easiest way to convert int
     //to hex, trying to send out one at a time produces weird results
     std::stringstream cursor;
-    cursor << "\033[" << std::hex << X << ';' << std::hex << Y << 'H';
+    cursor << "\033[" << std::hex << r << ';' << std::hex << c << 'H';
     std::cout << cursor.str();
 #endif
 }
