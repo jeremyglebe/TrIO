@@ -11,8 +11,10 @@ int main(){
     // plant randomly positioned green X's in the terminal
     srand(time(NULL));
     for(int i = 0; i < 9; i++){
-        moveCursor(rand() % 3 + 4, rand() % 10);
+        moveCursor(rand() % 3 + 3, rand() % 80);
+        TermGame::sleep(10);
         print("&40X");
+        TermGame::sleep(10);
     }
 
     moveCursor(0, 0);
