@@ -18,7 +18,6 @@
 #else
 // Libraries only used by non-Windows
 #include <unistd.h>
-#include <sstream>
 #endif
 
 /*
@@ -688,11 +687,8 @@ void TermPrint::moveCursor(short r, short c)
     r++;
     c++;
     // on *nix use ANSI escape
-    //use string stream here as the easiest way to convert int
-    //to hex, trying to send out one at a time produces weird results
-    std::stringstream cursor;
-    cursor << "\033[" << std::hex << r << ';' << std::hex << c << 'H';
-    std::cout << cursor.str();
+    std::string pos = "\033[" + std::to_string(r) + ';' + std::to_string(c) + 'f';
+    std::cout << pos;
 #endif
 }
 
