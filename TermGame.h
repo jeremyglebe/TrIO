@@ -680,7 +680,8 @@ void TermPrint::moveCursor(short r, short c)
     }
     // if using Windows, use windows.h
     // We must have a reference to the active terminal for Windows
-    COORD cor = {r, c};
+    // Coordinates are (x, y). Columns are x, rows are y, so r/c becomes c/r
+    COORD cor = {c, r};
     SetConsoleCursorPosition(_active_terminal, cor);
 #else
     // for some reason, row and column in ANSI start at 1, we want it to start at 0
