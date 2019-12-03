@@ -3,6 +3,7 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define WINDOWS true
 #endif
+
 // Include for all platforms
 #include <chrono>
 #include <codecvt>
@@ -11,6 +12,15 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+// Include only for Windows
+#if defined(WINDOWS)
+#include <fcntl.h>
+#include <windows.h>
+#else
+// Include only for *nix
+#include <unistd.h>
+#endif
 
 namespace Term
 {
@@ -108,16 +118,14 @@ typedef Point p;
 class Color
 {
 public:
+    unsigned short fg;
+    unsigned short bg;
     /**
      * Creates a Color object
      * @param fg color code for the foreground
      * @param bg color code for the background
      */
     Color(const unsigned short &fg, const unsigned short &bg);
-
-private:
-    unsigned short fg;
-    unsigned short bg;
 };
 typedef Color col;
 
@@ -208,6 +216,12 @@ private:
     wostream *wout;
     bool wide;
     void _set_color(Color c);
+
+#if defined(WINDOWS)
+    bool _windows_setup;
+    HANDLE _active_terminal;
+    void _setupWindows();
+#endif
 };
 } // namespace Term
 
@@ -311,12 +325,22 @@ void Term::Sleep::call()
 }
 
 /*
+IMPLEMENTATIONS FOR COLOR FUNCTIONS
+*/
+Term::Color::Color(const unsigned short &fg, const unsigned short &bg)
+{
+    this->fg = fg;
+    this->bg = bg;
+}
+
+/*
 IMPLEMENTATIONS FOR IO
 */
 
 Term::IO::IO()
 {
 #if defined(WINDOWS)
+    _windows_setup = false;
     wide = true;
     wout = &wcout;
 #else
@@ -327,6 +351,10 @@ Term::IO::IO()
 
 Term::IO &Term::IO::operator<<(string text)
 {
+    // Setup Windows if we haven't yet.
+    if (!_windows_setup)
+        _setupWindows();
+
     // Reset the color on every new line, easiest way to do this is just to
     // replace every '\n' with '&00\n' (using the Termio color escapes)
     text = replace_all(text, "\n", "&00\n");
@@ -355,9 +383,9 @@ Term::IO &Term::IO::operator<<(string text)
 
         // Set the color based on the first 3 characters of each substring
         // (Make sure the substring contains a color code, it may be "")
-#if defined(WINDOWS)
-#else
-#endif
+        if (strings[i].size() > 3){
+            _set_color(Color(strings[i][1] - '0', strings[i][2] - '0'));
+        }
 
         // Print the line, using either a wide or narrow stream
         if (wide)
@@ -389,4 +417,27 @@ void Term::IO::_set_color(Color c)
     static const unsigned short _fg[] = {39, 30, 31, 33, 32, 34, 36, 35, 37};
     static const unsigned short _bg[] = {49, 40, 41, 43, 42, 44, 46, 45, 47};
 #endif
+
+#if defined(WINDOWS)
+    if (!_windows_setup)
+        _setupWindows();
+    SetConsoleTextAttribute(_active_terminal, (16 * _bg[c.bg]) + _fg[c.fg]);
+#else
+#endif
 }
+
+#if defined(WINDOWS)
+void Term::IO::_setupWindows()
+{
+    // If we're using windows and it has not yet been fixed
+    if (!_windows_setup)
+    {
+        // set the console mode for unicode
+        _setmode(_fileno(stdout), _O_U16TEXT);
+        // We must have a reference to the active terminal for Windows' color API
+        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+        // Mark the Windows fix as complete
+        _windows_setup = true;
+    }
+}
+#endif
