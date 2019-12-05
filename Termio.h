@@ -28,6 +28,7 @@ namespace Term
 using std::cout;
 using std::ostream;
 using std::string;
+using std::to_string;
 using std::vector;
 using std::wcout;
 using std::wostream;
@@ -351,9 +352,11 @@ Term::IO::IO()
 
 Term::IO &Term::IO::operator<<(string text)
 {
+#if defined(WINDOWS)
     // Setup Windows if we haven't yet.
     if (!_windows_setup)
         _setupWindows();
+#endif
 
     // Reset the color on every new line, easiest way to do this is just to
     // replace every '\n' with '&00\n' (using the Termio color escapes)
@@ -366,13 +369,6 @@ Term::IO &Term::IO::operator<<(string text)
     // Split the string by "&XY" with X and Y as numeric color codes
     vector<string>
         strings = rsplit(text, "&[0-8][0-8]", true);
-
-    // Debugging, print out the split lines to help understand how the string
-    // is split.
-    // for (int i = 0; i < strings.size(); i++)
-    // {
-    //     cout << strings[i] << std::endl;
-    // }
 
     // Print each line of the vector
     for (int i = 0; i < strings.size(); i++)
@@ -426,6 +422,14 @@ void Term::IO::_set_color(Color c)
         _setupWindows();
     SetConsoleTextAttribute(_active_terminal, _fg[c.fg] + _bg[c.bg]);
 #else
+    if (wide)
+    {
+        *wout << "\033[" + to_string(_fg[c.fg]) + to_string(_bg[c.bg]) + 'm';
+    }
+    else
+    {
+        *out << "\033[" + to_string(_fg[c.fg]) + ';' + to_string(_bg[c.bg]) + 'm';
+    }
 #endif
 }
 
