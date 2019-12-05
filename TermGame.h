@@ -10,224 +10,225 @@
 #include <vector>
 #if defined(WINDOWS)
 // Libraries only used in Windows
+#include <codecvt>
 #include <conio.h>
 #include <fcntl.h>
-#include <windows.h>
+#include <io.h>
 #include <locale>
-#include <codecvt>
+#include <windows.h>
 #else
 // Libraries only used by non-Windows
 #include <unistd.h>
 #endif
 
 /*
- *  _____        __ _       _   _                            _____           _        _                         
- * |  __ \      / _(_)     | | (_)                   ___    |  __ \         | |      | |                        
- * | |  | | ___| |_ _ _ __ | |_ _  ___  _ __  ___   ( _ )   | |__) | __ ___ | |_ ___ | |_ _   _ _ __   ___  ___ 
+ *  _____        __ _       _   _                            _____           _        _
+ * |  __ \      / _(_)     | | (_)                   ___    |  __ \         | |      | |
+ * | |  | | ___| |_ _ _ __ | |_ _  ___  _ __  ___   ( _ )   | |__) | __ ___ | |_ ___ | |_ _   _ _ __   ___  ___
  * | |  | |/ _ \  _| | '_ \| __| |/ _ \| '_ \/ __|  / _ \/\ |  ___/ '__/ _ \| __/ _ \| __| | | | '_ \ / _ \/ __|
  * | |__| |  __/ | | | | | | |_| | (_) | | | \__ \ | (_>  < | |   | | | (_) | || (_) | |_| |_| | |_) |  __/\__ \
  * |_____/ \___|_| |_|_| |_|\__|_|\___/|_| |_|___/  \___/\/ |_|   |_|  \___/ \__\___/ \__|\__, | .__/ \___||___/
- *                                                                                         __/ | |              
- *                                                                                        |___/|_|              
+ *                                                                                         __/ | |
+ *                                                                                        |___/|_|
  * Read the comment blocks on these functions to learn more about how to use the library.
  */
 
 namespace TermGame
 {
 
-/**
- * Gets a single key from the keyboard, attempting to look for special
- * character sequences indicating an arrow key.
- * @return a std::string containing either a single character (from the key
- * that was pressed) or a code indicating an arrow key ("ARROW_UP",
- * "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT")
- */
-std::string getkey();
+    /**
+     * Gets a single key from the keyboard, attempting to look for special
+     * character sequences indicating an arrow key.
+     * @return a std::string containing either a single character (from the key
+     * that was pressed) or a code indicating an arrow key ("ARROW_UP",
+     * "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT")
+     */
+    std::string getkey();
 
-/**
- * Gets a single character from stdin without need for a newline buffer. (No
- * need to press enter/return to finish input)
- * @return char  the character entered
- */
-char getch();
+    /**
+     * Gets a single character from stdin without need for a newline buffer. (No
+     * need to press enter/return to finish input)
+     * @return char  the character entered
+     */
+    char getch();
 
-/**
- * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters depending
- * on the user's platform.
- * @return a std::string containing one of four values that represent which
- * arrow key was pressed. "ARROW_UP", "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT"
- * @exception KeyPressError is thrown any time a non-arrow key is pressed in
- * response to this function
- */
-std::string getarrow();
+    /**
+     * Gets an arrow key, unbuffered, from stdin. Expects 2-3 characters depending
+     * on the user's platform.
+     * @return a std::string containing one of four values that represent which
+     * arrow key was pressed. "ARROW_UP", "ARROW_DOWN", "ARROW_LEFT", "ARROW_RIGHT"
+     * @exception KeyPressError is thrown any time a non-arrow key is pressed in
+     * response to this function
+     */
+    std::string getarrow();
 
-/**
- * Pauses the program for some time before continuing.
- * @param ms the time to pause in miliseconds (1000th of a second)
- */
-void sleep(unsigned int ms);
+    /**
+     * Pauses the program for some time before continuing.
+     * @param ms the time to pause in miliseconds (1000th of a second)
+     */
+    void sleep(unsigned int ms);
 
 } // namespace TermGame
 
 namespace TermPrint
 {
-/**
- * TermPrint color codes stored as string objects for easy use. The codes will
- * also be documented on the repository.
- */
-static const unsigned short DEFAULT = 0;
-static const unsigned short BLACK = 1;
-static const unsigned short RED = 2;
-static const unsigned short YELLOW = 3;
-static const unsigned short GREEN = 4;
-static const unsigned short BLUE = 5;
-static const unsigned short CYAN = 6;
-static const unsigned short MAGENTA = 7;
-static const unsigned short WHITE = 8;
+    /**
+     * TermPrint color codes stored as string objects for easy use. The codes will
+     * also be documented on the repository.
+     */
+    static const unsigned short DEFAULT = 0;
+    static const unsigned short BLACK = 1;
+    static const unsigned short RED = 2;
+    static const unsigned short YELLOW = 3;
+    static const unsigned short GREEN = 4;
+    static const unsigned short BLUE = 5;
+    static const unsigned short CYAN = 6;
+    static const unsigned short MAGENTA = 7;
+    static const unsigned short WHITE = 8;
 
-/**
- * Prints a string to stdout. Interprets any TermPrint color codes of the form
- * &XY where X is the foreground code and Y is the background code.
- * @param msg the string that the user wants to print
- * @param colorize_newline should newlines have color applied to them? It can
- * create very strange effects if enabled.
-*/
-void print(std::string msg, bool colorize_newline = false);
+    /**
+     * Prints a string to stdout. Interprets any TermPrint color codes of the form
+     * &XY where X is the foreground code and Y is the background code.
+     * @param msg the string that the user wants to print
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
+    */
+    void print(std::string msg, bool colorize_newline = false);
 
-/**
- * Prints a string to stdout. Overrides any TermPrint color codes found in the
- * text with color passed in by parameter.
- * @param msg the string that the user wants to print
- * @param forecolor the color of the text in the string
- * @param colorize_newline should newlines have color applied to them? It can
- * create very strange effects if enabled.
- */
-void print(std::string msg, unsigned short forecolor, bool colorize_newline = false);
+    /**
+     * Prints a string to stdout. Overrides any TermPrint color codes found in the
+     * text with color passed in by parameter.
+     * @param msg the string that the user wants to print
+     * @param forecolor the color of the text in the string
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
+     */
+    void print(std::string msg, unsigned short forecolor, bool colorize_newline = false);
 
-/**
- * Prints a string to stdout. Overrides any TermPrint color codes found in the
- * text with color passed in by parameter.
- * @param msg the string that the user wants to print
- * @param forecolor the color of the text in the string
- * @param backcolor the color behind the text in the string
- * @param colorize_newline should newlines have color applied to them? It can
- * create very strange effects if enabled.
- */
-void print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline = false);
+    /**
+     * Prints a string to stdout. Overrides any TermPrint color codes found in the
+     * text with color passed in by parameter.
+     * @param msg the string that the user wants to print
+     * @param forecolor the color of the text in the string
+     * @param backcolor the color behind the text in the string
+     * @param colorize_newline should newlines have color applied to them? It can
+     * create very strange effects if enabled.
+     */
+    void print(std::string msg, unsigned short forecolor, unsigned short backcolor, bool colorize_newline = false);
 
-/**
- * Clears the terminal of text.
- */
-void clear();
+    /**
+     * Clears the terminal of text.
+     */
+    void clear();
 
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
- * @return std::string containing both of the original strings side-by-side
- */
-std::string fuse(std::string left, std::string right);
+    /**
+     * Fuses two multi-line string together for printing side-by-side
+     * @param left the string that will be on the left half of the fused string
+     * @param right the string that will be on the right half of the fused string
+     * @return std::string containing both of the original strings side-by-side
+     */
+    std::string fuse(std::string left, std::string right);
 
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
- * @param pad bool, whether to pad each line of the string to be the same width
- */
-std::string fuse(std::string left, std::string right, bool pad);
+    /**
+     * Fuses two multi-line string together for printing side-by-side
+     * @param left the string that will be on the left half of the fused string
+     * @param right the string that will be on the right half of the fused string
+     * @param pad bool, whether to pad each line of the string to be the same width
+     */
+    std::string fuse(std::string left, std::string right, bool pad);
 
-/**
- * Split a string and store each new substring in a vector.
- * @param text the original string
- * @param delim the delimiting character to split by
- * @return std::vector containing each substring
- */
-std::vector<std::string> splitstring(std::string text, char delim);
+    /**
+     * Split a string and store each new substring in a vector.
+     * @param text the original string
+     * @param delim the delimiting character to split by
+     * @return std::vector containing each substring
+     */
+    std::vector<std::string> splitstring(std::string text, char delim);
 
-/**
- * Moves the terminal's cursor
- * @param row y-value to move the cursor to
- * @param column x-value to move the cursor to
- */
-void moveCursor(short row, short column);
+    /**
+     * Moves the terminal's cursor
+     * @param row y-value to move the cursor to
+     * @param column x-value to move the cursor to
+     */
+    void moveCursor(short row, short column);
 
-/**
- *   _____ _______ ____  _____  _ 
- *  / ____|__   __/ __ \|  __ \| |
- * | (___    | | | |  | | |__) | |
- *  \___ \   | | | |  | |  ___/| |
- *  ____) |  | | | |__| | |    |_|
- * |_____/   |_|  \____/|_|    (_)
- *                                
- * Everything below this comment block you can ignore! From here on out, the file consists
- * only of internal variables that the library uses, or implementations of the functions
- * described above. If you truly want to know how everything is implemented, feel free to
- * continue reading. But, if you're only interested in utlizing the library, there is no
- * need to view the rest of this file.
- */
+    /**
+     *   _____ _______ ____  _____  _
+     *  / ____|__   __/ __ \|  __ \| |
+     * | (___    | | | |  | | |__) | |
+     *  \___ \   | | | |  | |  ___/| |
+     *  ____) |  | | | |__| | |    |_|
+     * |_____/   |_|  \____/|_|    (_)
+     *
+     * Everything below this comment block you can ignore! From here on out, the file consists
+     * only of internal variables that the library uses, or implementations of the functions
+     * described above. If you truly want to know how everything is implemented, feel free to
+     * continue reading. But, if you're only interested in utlizing the library, there is no
+     * need to view the rest of this file.
+     */
 
 #if defined(WINDOWS)
-// Windows fix bool.
-static bool _winFixed = false;
-// We must have a reference to the active terminal for Windows' color API
-static HANDLE _active_terminal;
+     // Windows fix bool.
+    static bool _winFixed = false;
+    // We must have a reference to the active terminal for Windows' color API
+    static HANDLE _active_terminal;
 #endif
 
 #if defined(WINDOWS)
-/**
- * Instead of making a #if every time a string shows up and making the
- * string a wide string if we're on Windows, we can overload the <<
- * operator to work with wostreams and strings so lines like:
- * wcout << "Hello World!";
- * will actually work. We're just going to convert the input string
- * into a wstring.
- * @param out the wide ostream to be output to
- * @param text the text to be converted to a wstring
- * @return the same ostream being used (for chaining output statements)
- */
-std::wostream &operator<<(std::wostream &out, std::string text);
+    /**
+     * Instead of making a #if every time a string shows up and making the
+     * string a wide string if we're on Windows, we can overload the <<
+     * operator to work with wostreams and strings so lines like:
+     * wcout << "Hello World!";
+     * will actually work. We're just going to convert the input string
+     * into a wstring.
+     * @param out the wide ostream to be output to
+     * @param text the text to be converted to a wstring
+     * @return the same ostream being used (for chaining output statements)
+     */
+    std::wostream& operator<<(std::wostream& out, std::string text);
 #endif
 
 #if defined(WINDOWS)
-void fixWin(){
-    // If we're using windows and it has not yet been fixed
-    if (!_winFixed)
-    {
-        // set the console mode for unicode
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        // We must have a reference to the active terminal for Windows' color API
-        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-        // Mark the Windows fix as complete
-        _winFixed = true;
+    void fixWin() {
+        // If we're using windows and it has not yet been fixed
+        if (!_winFixed)
+        {
+            // set the console mode for unicode
+            _setmode(_fileno(stdout), _O_U16TEXT);
+            // We must have a reference to the active terminal for Windows' color API
+            _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+            // Mark the Windows fix as complete
+            _winFixed = true;
+        }
     }
-}
 #endif
 
-/**
- * Internal color code definitions which will work
- * with the Windows color API (or ANSI on *nix)
- * TermPrint color codes are translated back to these when printing.
- */
+    /**
+     * Internal color code definitions which will work
+     * with the Windows color API (or ANSI on *nix)
+     * TermPrint color codes are translated back to these when printing.
+     */
 #if defined(WINDOWS)
-static const unsigned short _BLACK = 0;
-static const unsigned short _BLUE = 1;
-static const unsigned short _GREEN = 2;
-static const unsigned short _CYAN = 3;
-static const unsigned short _RED = 4;
-static const unsigned short _MAGENTA = 5;
-static const unsigned short _YELLOW = 6;
-static const unsigned short _WHITE = 7;
-static const unsigned short _RESET_COLOR = 0;
+    static const unsigned short _BLACK = 0;
+    static const unsigned short _BLUE = 1;
+    static const unsigned short _GREEN = 2;
+    static const unsigned short _CYAN = 3;
+    static const unsigned short _RED = 4;
+    static const unsigned short _MAGENTA = 5;
+    static const unsigned short _YELLOW = 6;
+    static const unsigned short _WHITE = 7;
+    static const unsigned short _RESET_COLOR = 0;
 #else
-static const unsigned short _BLACK = 30;
-static const unsigned short _RED = 31;
-static const unsigned short _GREEN = 32;
-static const unsigned short _YELLOW = 33;
-static const unsigned short _BLUE = 34;
-static const unsigned short _MAGENTA = 35;
-static const unsigned short _CYAN = 36;
-static const unsigned short _WHITE = 37;
-static const unsigned short _RESET_COLOR = 39;
+    static const unsigned short _BLACK = 30;
+    static const unsigned short _RED = 31;
+    static const unsigned short _GREEN = 32;
+    static const unsigned short _YELLOW = 33;
+    static const unsigned short _BLUE = 34;
+    static const unsigned short _MAGENTA = 35;
+    static const unsigned short _CYAN = 36;
+    static const unsigned short _WHITE = 37;
+    static const unsigned short _RESET_COLOR = 39;
 #endif
 
 } // namespace TermPrint
@@ -238,38 +239,38 @@ static const unsigned short _RESET_COLOR = 39;
  */
 namespace TermError
 {
-/**
-     * Exception for incorrect key pressed in input functions from TermGame.
-     * This is useful for error handling and debugging.
-     */
-class KeyPressError : public std::exception
-{
-    std::string what_message;
+    /**
+         * Exception for incorrect key pressed in input functions from TermGame.
+         * This is useful for error handling and debugging.
+         */
+    class KeyPressError : public std::exception
+    {
+        std::string what_message;
 
-public:
-    KeyPressError();
-    KeyPressError(std::string what_message);
-    virtual const char *what() const throw();
-};
+    public:
+        KeyPressError();
+        KeyPressError(std::string what_message);
+        virtual const char* what() const throw();
+    };
 } // namespace TermError
 
 /*
- *  ______                _   _               _____                 _                           _        _   _                 
- * |  ____|              | | (_)             |_   _|               | |                         | |      | | (_)                
- * | |__ _   _ _ __   ___| |_ _  ___  _ __     | |  _ __ ___  _ __ | | ___ _ __ ___   ___ _ __ | |_ __ _| |_ _  ___  _ __  ___ 
+ *  ______                _   _               _____                 _                           _        _   _
+ * |  ____|              | | (_)             |_   _|               | |                         | |      | | (_)
+ * | |__ _   _ _ __   ___| |_ _  ___  _ __     | |  _ __ ___  _ __ | | ___ _ __ ___   ___ _ __ | |_ __ _| |_ _  ___  _ __  ___
  * |  __| | | | '_ \ / __| __| |/ _ \| '_ \    | | | '_ ` _ \| '_ \| |/ _ \ '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \/ __|
  * | |  | |_| | | | | (__| |_| | (_) | | | |  _| |_| | | | | | |_) | |  __/ | | | | |  __/ | | | || (_| | |_| | (_) | | | \__ \
  * |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_| |_____|_| |_| |_| .__/|_|\___|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|___/
- *                                                           | |                                                               
- *                                                           |_|                                                               
+ *                                                           | |
+ *                                                           |_|
  */
 
-/*
- *  _____              ___                  ___             _   _             
- * |_   _|__ _ _ _ __ / __|__ _ _ __  ___  | __|  _ _ _  __| |_(_)___ _ _  ___
- *   | |/ -_) '_| '  \ (_ / _` | '  \/ -_) | _| || | ' \/ _|  _| / _ \ ' \(_-<
- *   |_|\___|_| |_|_|_\___\__,_|_|_|_\___| |_| \_,_|_||_\__|\__|_\___/_||_/__/
- */
+ /*
+  *  _____              ___                  ___             _   _
+  * |_   _|__ _ _ _ __ / __|__ _ _ __  ___  | __|  _ _ _  __| |_(_)___ _ _  ___
+  *   | |/ -_) '_| '  \ (_ / _` | '  \/ -_) | _| || | ' \/ _|  _| / _ \ ' \(_-<
+  *   |_|\___|_| |_|_|_\___\__,_|_|_|_\___| |_| \_,_|_||_\__|\__|_\___/_||_/__/
+  */
 
 char TermGame::getch()
 {
@@ -412,7 +413,7 @@ void TermGame::sleep(unsigned int ms)
 }
 
 /*
- *  _____              ___     _     _     ___             _   _             
+ *  _____              ___     _     _     ___             _   _
  * |_   _|__ _ _ _ __ | _ \_ _(_)_ _| |_  | __|  _ _ _  __| |_(_)___ _ _  ___
  *   | |/ -_) '_| '  \|  _/ '_| | ' \  _| | _| || | ' \/ _|  _| / _ \ ' \(_-<
  *   |_|\___|_| |_|_|_|_| |_| |_|_||_\__| |_| \_,_|_||_\__|\__|_\___/_||_/__/
@@ -431,7 +432,7 @@ void TermPrint::print(std::string msg, bool colorize_newline)
         _BLUE,
         _CYAN,
         _MAGENTA,
-        _WHITE};
+        _WHITE };
     /**
      * If we aren't coloring newlines, we need to ensure every newline includes
      * a &00 indicating that it should be reset.
@@ -541,7 +542,7 @@ void TermPrint::print(std::string msg, unsigned short forecolor, unsigned short 
         _BLUE,
         _CYAN,
         _MAGENTA,
-        _WHITE};
+        _WHITE };
     forecolor = _COLORS[forecolor];
     backcolor = _COLORS[backcolor];
     /**
@@ -675,13 +676,13 @@ std::vector<std::string> TermPrint::splitstring(std::string text, char delim)
 void TermPrint::moveCursor(short r, short c)
 {
 #if defined(WINDOWS)
-    if(!_winFixed){
+    if (!_winFixed) {
         fixWin();
     }
     // if using Windows, use windows.h
     // We must have a reference to the active terminal for Windows
     // Coordinates are (x, y). Columns are x, rows are y, so r/c becomes c/r
-    COORD cor = {c, r};
+    COORD cor = { c, r };
     SetConsoleCursorPosition(_active_terminal, cor);
 #else
     // for some reason, row and column in ANSI start at 1, we want it to start at 0
@@ -694,7 +695,7 @@ void TermPrint::moveCursor(short r, short c)
 }
 
 #if defined(WINDOWS)
-std::wostream &TermPrint::operator<<(std::wostream &out, std::string text)
+std::wostream& TermPrint::operator<<(std::wostream& out, std::string text)
 {
     /**
      * create a string <-> wide string converter
@@ -711,7 +712,7 @@ std::wostream &TermPrint::operator<<(std::wostream &out, std::string text)
 #endif
 
 /*
- *  _____              ___                   ___             _   _             
+ *  _____              ___                   ___             _   _
  * |_   _|__ _ _ _ __ | __|_ _ _ _ ___ _ _  | __|  _ _ _  __| |_(_)___ _ _  ___
  *   | |/ -_) '_| '  \| _|| '_| '_/ _ \ '_| | _| || | ' \/ _|  _| / _ \ ' \(_-<
  *   |_|\___|_| |_|_|_|___|_| |_| \___/_|   |_| \_,_|_||_\__|\__|_\___/_||_/__/
@@ -727,7 +728,7 @@ TermError::KeyPressError::KeyPressError(std::string what_message)
     this->what_message = what_message;
 }
 
-const char *TermError::KeyPressError::what() const throw()
+const char* TermError::KeyPressError::what() const throw()
 {
     return what_message.c_str();
 }
