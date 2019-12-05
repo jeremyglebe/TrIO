@@ -383,7 +383,8 @@ Term::IO &Term::IO::operator<<(string text)
 
         // Set the color based on the first 3 characters of each substring
         // (Make sure the substring contains a color code, it may be "")
-        if (strings[i].size() > 3){
+        if (strings[i].size() > 3)
+        {
             _set_color(Color(strings[i][1] - '0', strings[i][2] - '0'));
         }
 
@@ -402,6 +403,8 @@ Term::IO &Term::IO::operator<<(string text)
             else
                 *out << strings[i];
         }
+
+        _set_color(Color(0, 0));
     }
 
     // Return this IO object (for any chained outputs)
@@ -421,7 +424,7 @@ void Term::IO::_set_color(Color c)
 #if defined(WINDOWS)
     if (!_windows_setup)
         _setupWindows();
-    SetConsoleTextAttribute(_active_terminal, (16 * _bg[c.bg]) + _fg[c.fg]);
+    SetConsoleTextAttribute(_active_terminal, _fg[c.fg] + _bg[c.bg]);
 #else
 #endif
 }
