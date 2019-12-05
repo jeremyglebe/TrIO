@@ -16,6 +16,7 @@
 // Include only for Windows
 #if defined(WINDOWS)
 #include <fcntl.h>
+#include <io.h>
 #include <windows.h>
 #else
 // Include only for *nix
@@ -226,20 +227,23 @@ private:
 };
 } // namespace Term
 
-/*
- *  _____                 _                           _        _   _                 
- * |_   _|               | |                         | |      | | (_)                
- *   | |  _ __ ___  _ __ | | ___ _ __ ___   ___ _ __ | |_ __ _| |_ _  ___  _ __  ___ 
- *   | | | '_ ` _ \| '_ \| |/ _ \ '_ ` _ \ / _ \ '_ \| __/ _` | __| |/ _ \| '_ \/ __|
- *  _| |_| | | | | | |_) | |  __/ | | | | |  __/ | | | || (_| | |_| | (_) | | | \__ \
- * |_____|_| |_| |_| .__/|_|\___|_| |_| |_|\___|_| |_|\__\__,_|\__|_|\___/|_| |_|___/
- *                 | |                                                               
- *                 |_|                                                               
- */
-
-/*
-IMPLEMENTATIONS FOR HELPER FUNCTIONS
+/* ██╗███╗   ███╗██████╗ ██╗     ███████╗███╗   ███╗███████╗███╗   ██╗████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗███████╗
+ * ██║████╗ ████║██╔══██╗██║     ██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+ * ██║██╔████╔██║██████╔╝██║     █████╗  ██╔████╔██║█████╗  ██╔██╗ ██║   ██║   ███████║   ██║   ██║██║   ██║██╔██╗ ██║███████╗
+ * ██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║╚════██║
+ * ██║██║ ╚═╝ ██║██║     ███████╗███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║███████║
+ * ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+ * ANSI Shadow font
+ * http://patorjk.com/software/taag/
 */
+
+/*  _  _  ____  __    ____  ____  ____    ____  _  _  __ _   ___  ____  __  __   __ _    __  _  _  ____  __   
+ * / )( \(  __)(  )  (  _ \(  __)(  _ \  (  __)/ )( \(  ( \ / __)(_  _)(  )/  \ (  ( \  (  )( \/ )(  _ \(  )  
+ * ) __ ( ) _) / (_/\ ) __/ ) _)  )   /   ) _) ) \/ (/    /( (__   )(   )((  O )/    /   )( / \/ \ ) __// (_/\
+ * \_)(_/(____)\____/(__)  (____)(__\_)  (__)  \____/\_)__) \___) (__) (__)\__/ \_)__)  (__)\_)(_/(__)  \____/
+ * Graceful font
+ * http://patorjk.com/software/taag/
+ */
 
 // Just calls the regular expression split but delimeter does not have to be
 // a regular expression
@@ -257,6 +261,7 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
     std::regex rgx(delim);
     // Find parts of the string which do not match the regexp and append them
     // to the vector
+    // code -1 at the end means find everything but the rgx string (delimeter)
     std::sregex_token_iterator iter(text.begin(), text.end(), rgx, -1);
     std::sregex_token_iterator end;
     while (iter != end)
@@ -269,16 +274,23 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
     // the beginning of each line.
     if (include)
     {
+        // code 0 at the end means find instances of the rgx string (delimeter)
         std::sregex_token_iterator iter(text.begin(), text.end(), rgx, 0);
         std::sregex_token_iterator end;
 
         int i = 0;
         while (iter != end)
         {
+            // We are inserting the delimiter at the start
+            // of the NEXT string in the vector
             string temp = elems[i + 1];
+            // assign the string the delimiter
             elems[i + 1] = *iter;
+            // add back the original content
             elems[i + 1] += temp;
+            // the iterator moves forward
             ++iter;
+            // increment elems index
             i++;
         }
     }
@@ -289,9 +301,14 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
 std::string Term::replace_all(string text, string from, string to)
 {
     size_t start_pos = 0;
+    // While we can find the substring "from"
+    // (start position changes each time we make a replacement)
     while ((start_pos = text.find(from, start_pos)) != string::npos)
     {
+        // Make the replacement
         text.replace(start_pos, from.length(), to);
+        // Move past the string replacement's length, we don't need to
+        // check it
         start_pos += to.length();
     }
     return text;
@@ -312,9 +329,13 @@ std::wostream &Term::operator<<(wostream &wout, string text)
     return wout;
 }
 
-/*
-IMPLEMENTATIONS FOR COMMANDS
-*/
+/*   ___  __   _  _  _  _   __   __ _  ____    __  _  _  ____  __   
+ *  / __)/  \ ( \/ )( \/ ) / _\ (  ( \(    \  (  )( \/ )(  _ \(  )  
+ * ( (__(  O )/ \/ \/ \/ \/    \/    / ) D (   )( / \/ \ ) __// (_/\
+ *  \___)\__/ \_)(_/\_)(_/\_/\_/\_)__)(____/  (__)\_)(_/(__)  \____/
+ * Graceful font
+ * http://patorjk.com/software/taag/
+ */
 Term::Sleep::Sleep(const unsigned int &ms)
 {
     this->ms = ms;
@@ -325,18 +346,26 @@ void Term::Sleep::call()
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-/*
-IMPLEMENTATIONS FOR COLOR FUNCTIONS
-*/
+/*   ___  __   __     __  ____    __  _  _  ____  __   
+ *  / __)/  \ (  )   /  \(  _ \  (  )( \/ )(  _ \(  )  
+ * ( (__(  O )/ (_/\(  O ))   /   )( / \/ \ ) __// (_/\
+ *  \___)\__/ \____/ \__/(__\_)  (__)\_)(_/(__)  \____/
+ * Graceful font
+ * http://patorjk.com/software/taag/
+ */
 Term::Color::Color(const unsigned short &fg, const unsigned short &bg)
 {
     this->fg = fg;
     this->bg = bg;
 }
 
-/*
-IMPLEMENTATIONS FOR IO
-*/
+/*   __  __     __  _  _  ____  __   
+ *  (  )/  \   (  )( \/ )(  _ \(  )  
+ *   )((  O )   )( / \/ \ ) __// (_/\
+ *  (__)\__/   (__)\_)(_/(__)  \____/
+ * Graceful font
+ * http://patorjk.com/software/taag/
+ */
 
 Term::IO::IO()
 {
