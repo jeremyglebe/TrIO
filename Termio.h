@@ -211,18 +211,26 @@ public:
     // input operations
     IO &operator>>(string &str_var);
     IO &operator>>(char *&str_var);
+    /**
+     * Gets a single character from stdin.
+     * Input is unbuffered, echoless, blocking. For non-blocking, use a
+     * separate thread.
+     * @param ch_var the variable to read a character into
+     * @return this object (for chaining inputs)
+     */
     IO &operator>>(char &ch_var);
 
 private:
     ostream *out;
     wostream *wout;
     bool wide;
-    void _set_color(Color c);
+    void set_color(Color c);
 
 #if defined(WINDOWS)
-    bool _windows_setup;
-    HANDLE _active_terminal;
-    void _setupWindows();
+    bool windows_setup;
+    HANDLE stdin_terminal;
+    HANDLE stdout_terminal;
+    void setupWindows();
 #endif
 };
 } // namespace Term
@@ -370,7 +378,7 @@ Term::Color::Color(const unsigned short &fg, const unsigned short &bg)
 Term::IO::IO()
 {
 #if defined(WINDOWS)
-    _windows_setup = false;
+    windows_setup = false;
     wide = true;
     wout = &wcout;
 #else
@@ -383,8 +391,8 @@ Term::IO &Term::IO::operator<<(string text)
 {
 #if defined(WINDOWS)
     // Setup Windows if we haven't yet.
-    if (!_windows_setup)
-        _setupWindows();
+    if (!windows_setup)
+        setupWindows();
 #endif
 
     // Reset the color on every new line, easiest way to do this is just to
@@ -408,35 +416,84 @@ Term::IO &Term::IO::operator<<(string text)
 
         // Set the color based on the first 3 characters of each substring
         // (Make sure the substring contains a color code, it may be "")
-        if (strings[i].size() > 3)
+        if (strings[i].size() > 3 && i > 0)
         {
-            _set_color(Color(strings[i][1] - '0', strings[i][2] - '0'));
+            set_color(Color(strings[i][1] - '0', strings[i][2] - '0'));
         }
 
         // Print the line, using either a wide or narrow stream
         if (wide)
         {
-            if (strings[i].size() > 3)
+            // Strings too small to contain a color code OR
+            // the first string in the vector (which can't contain a color code
+            // or it would have split into the second) should be printed in
+            // their entirety, other strings we need to skip the first 3 chars
+            // which are the color code.
+            if (strings[i].size() > 3 && i > 0)
                 *wout << strings[i].substr(3);
             else
                 *wout << strings[i];
         }
         else
         {
-            if (strings[i].size() > 3)
+            // Strings too small to contain a color code OR
+            // the first string in the vector (which can't contain a color code
+            // or it would have split into the second) should be printed in
+            // their entirety, other strings we need to skip the first 3 chars
+            // which are the color code.
+            if (strings[i].size() > 3 && i > 0)
                 *out << strings[i].substr(3);
             else
                 *out << strings[i];
         }
 
-        _set_color(Color(0, 0));
+        set_color(Color(0, 0));
     }
 
     // Return this IO object (for any chained outputs)
     return *this;
 }
 
-void Term::IO::_set_color(Color c)
+Term::IO &Term::IO::operator<<(const char &key)
+{
+    if (wide)
+    {
+        *wout << key;
+    }
+    else
+    {
+        *out << key;
+    }
+    return *this;
+}
+
+Term::IO &Term::IO::operator>>(char &ch_var)
+{
+#if defined(WINDOWS)
+    // Keeps track of the console mode we started with
+    DWORD mode;
+    // Get the current mode so we can restore it later
+    GetConsoleMode(stdin_terminal, &mode);
+    // Set the console mode to unbuffered and echoless
+    SetConsoleMode(stdin_terminal, 0);
+
+    ch_var = std::cin.get();
+
+    // Restore the original console mode
+    SetConsoleMode(stdin_terminal, mode);
+#else
+    // turn off echo and get the input without a buffer
+    system("stty -brkint -ignpar -istrip -icrnl -ixon -opost -isig -icanon -echo");
+    // get the next stdin character
+    //key = getchar();
+    std::cin >> ch_var;
+    // set the terminal back to buffered input and echo
+    system("stty cooked echo");
+#endif
+    return *this;
+}
+
+void Term::IO::set_color(Color c)
 {
 #if defined(WINDOWS)
     static const unsigned short _fg[] = {7, 0, 4, 6, 2, 1, 3, 5, 7};
@@ -447,9 +504,9 @@ void Term::IO::_set_color(Color c)
 #endif
 
 #if defined(WINDOWS)
-    if (!_windows_setup)
-        _setupWindows();
-    SetConsoleTextAttribute(_active_terminal, _fg[c.fg] + _bg[c.bg]);
+    if (!windows_setup)
+        setupWindows();
+    SetConsoleTextAttribute(stdout_terminal, _fg[c.fg] + _bg[c.bg]);
 #else
     if (wide)
     {
@@ -463,17 +520,19 @@ void Term::IO::_set_color(Color c)
 }
 
 #if defined(WINDOWS)
-void Term::IO::_setupWindows()
+void Term::IO::setupWindows()
 {
     // If we're using windows and it has not yet been fixed
-    if (!_windows_setup)
+    if (!windows_setup)
     {
         // set the console mode for unicode
         _setmode(_fileno(stdout), _O_U16TEXT);
-        // We must have a reference to the active terminal for Windows' color API
-        _active_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
+        // We must have a reference to the input terminal for Windows' input API
+        stdin_terminal = GetStdHandle(STD_INPUT_HANDLE);
+        // We must have a reference to the output terminal for Windows' color API
+        stdout_terminal = GetStdHandle(STD_OUTPUT_HANDLE);
         // Mark the Windows fix as complete
-        _windows_setup = true;
+        windows_setup = true;
     }
 }
 #endif

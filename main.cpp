@@ -27,4 +27,26 @@ int main()
     }
     s += '\n';
     io << s;
+
+    // Testing input
+    char test = '1';
+    io << "Press keys 0-8 to see the color associated with that code.\n"
+       << "Press any other key to continue.\n";
+    io >> test;
+    while (test >= '0' && test <= '8')
+    {
+        if (test != '1')
+            io << std::string("&") + test + '1' + test + '\n';
+        else
+            io << std::string("&") + test + '8' + test + '\n';
+        io >> test;
+    }
+
+    // Test chained input and output
+    char input_test;
+    io << "Testing chaining...\n"
+       << "Press a key to be tripled,\n"
+       << "then press a key to be doubled,\n"
+       << "then press a key to be printed once.\n";
+    io >> input_test << input_test << input_test << input_test >> input_test << input_test << input_test >> input_test << input_test;
 }
