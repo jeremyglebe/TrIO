@@ -49,4 +49,15 @@ int main()
        << "then press a key to be doubled,\n"
        << "then press a key to be printed once.\n";
     io >> input_test << input_test << input_test << input_test >> input_test << input_test << input_test >> input_test << input_test;
+
+    // Test fusing strings in multiple ways
+    // io << "Testing fusing two strings...\n";
+    // io << "Testing fusing two strings with padding...\n";
+    io << "Testing fusing numerous strings...\n";
+    std::string blank = "";
+    blank += "&58┌────┐\n";
+    blank += "&58│■■■■│\n";
+    blank += "&58│■■■■│\n";
+    blank += "&58└────┘\n";
+    io << Term::fuse({blank, blank, blank, blank});
 }

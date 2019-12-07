@@ -38,17 +38,17 @@ using std::wostream;
  * Fuses two multi-line string together for printing side-by-side
  * @param left the string that will be on the left half of the fused string
  * @param right the string that will be on the right half of the fused string
- * @return string containing both of the original strings side-by-side
- */
-string fuse(string left, string right);
-
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
  * @param pad bool, whether to pad each line of the string to be the same width
  */
-string fuse(string left, string right, bool pad);
+string fuse(string left, string right, bool pad = false);
+
+/**
+ * Fuses multiple multi-line strings together for printing side-by-side.
+ * @param strings an initializer list of strings to fuse, left to right
+ * Initializer lists look like: {myStrVar, "Hello", "test", other_string_var}
+ * @param pad bool, whether to pad each line of the string to be the same width
+ */
+string fuse(std::initializer_list<string> strings, bool pad = false);
 
 /**
  * Split a string and store each new substring in a vector.
@@ -252,6 +252,79 @@ private:
  * Graceful font
  * http://patorjk.com/software/taag/
  */
+
+std::string Term::fuse(string left, string right, bool pad)
+{
+    string result = "";
+    // split the strings, create vectors
+    vector<string> lv = split(left, '\n');
+    vector<string> rv = split(right, '\n');
+    // correct the number of lines in the strings so they match
+    if (lv.size() > rv.size())
+    {
+        int diff = lv.size() - rv.size();
+        for (int i = 0; i < diff; i++)
+        {
+            rv.push_back("");
+        }
+    }
+    else if (lv.size() < rv.size())
+    {
+
+        int diff = rv.size() - lv.size();
+        for (int i = 0; i < diff; i++)
+        {
+            lv.push_back("");
+        }
+    }
+    if (pad)
+    {
+        // find the largest line out of any of the vectors
+        int max = 0;
+        for (int i = 0; i < lv.size(); i++)
+        {
+            if (lv[i].size() > max)
+                max = lv[i].size();
+            if (rv[i].size() > max)
+                max = rv[i].size();
+        }
+        // for each line in both vectors, pad the line for max size
+        for (int i = 0; i < lv.size(); i++)
+        {
+            if (lv[i].size() < max)
+            {
+                int diff = max - lv[i].size();
+                lv[i] += std::string(diff, ' ');
+            }
+            if (rv[i].size() < max)
+            {
+                int diff = max - rv[i].size();
+                rv[i] += std::string(diff, ' ');
+            }
+        }
+    }
+    // loop through the vectors and produce the new string
+    for (int i = 0; i < lv.size(); i++)
+    {
+        result += lv[i] + rv[i] + '\n';
+    }
+    return result;
+}
+
+std::string Term::fuse(std::initializer_list<string> strings, bool pad)
+{
+    // Variable for storing the resulting string
+    string result = "";
+    // Moving the initializer_list into a vector b/c I think they're easier
+    vector<string> vstrings;
+    vstrings.insert(vstrings.end(), strings.begin(), strings.end());
+    // Loop through all strings and fuse them
+    for (int i = 0; i < vstrings.size(); i++)
+    {
+        result = fuse(result, vstrings[i], pad);
+    }
+    return result;
+}
 
 // Just calls the regular expression split but delimeter does not have to be
 // a regular expression
