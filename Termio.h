@@ -166,7 +166,7 @@ public:
     void call() override;
 };
 typedef Clear clr;
-static Command *clear = new Clear();
+static Clear clear = Clear();
 
 /**
  * The Sleep object is a command which, when passed to an IO object, will
@@ -237,7 +237,7 @@ public:
      * @param command the command to use .call() on.
      * @return this object, for chaining outputs.
      */
-    IO &operator<<(Command *command);
+    IO &operator<<(Command &command);
 
     // input operations
     IO &operator>>(string &str_var);

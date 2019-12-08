@@ -380,9 +380,9 @@ Term::IO &Term::IO::operator<<(const Color &color)
     return *this;
 }
 
-Term::IO &Term::IO::operator<<(Command *command)
+Term::IO &Term::IO::operator<<(Command &command)
 {
-    command->call();
+    command.call();
     return *this;
 }
 
