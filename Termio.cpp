@@ -192,6 +192,52 @@ void Term::Sleep::call()
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
+void Term::Clear::call()
+{
+#if defined(WINDOWS)
+    // The Windows version of this method comes almost character-for-character
+    // from the Microsoft docs. Credit Here:
+    // https://docs.microsoft.com/en-us/windows/console/clearing-the-screen
+    static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD coordScreen = {0, 0}; // home for the cursor
+    DWORD cCharsWritten;
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD dwConSize;
+    if (!GetConsoleScreenBufferInfo(hConsole, &csbi))
+    {
+        return;
+    }
+    dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
+    if (!FillConsoleOutputCharacter(hConsole, (TCHAR)' ', dwConSize, coordScreen, &cCharsWritten))
+    {
+        return;
+    }
+    if (!GetConsoleScreenBufferInfo(hConsole, &csbi))
+    {
+        return;
+    }
+    if (!FillConsoleOutputAttribute(hConsole, csbi.wAttributes, dwConSize, coordScreen, &cCharsWritten))
+    {
+        return;
+    }
+    SetConsoleCursorPosition(hConsole, coordScreen);
+#else
+    // on *nix use ANSI escape
+    std::cout << "\033[2J";
+#endif
+}
+
+/*  ____   __  __  __ _  ____    _  _  ____  ____  _  _   __  ____  ____ 
+ * (  _ \ /  \(  )(  ( \(_  _)  ( \/ )(  __)(_  _)/ )( \ /  \(    \/ ___)
+ *  ) __/(  O ))( /    /  )(    / \/ \ ) _)   )(  ) __ ((  O )) D (\___ \
+ * (__)   \__/(__)\_)__) (__)   \_)(_/(____) (__) \_)(_/ \__/(____/(____/
+ */
+Term::Point::Point(const unsigned short &row, const unsigned short &col)
+{
+    this->row = row;
+    this->col = col;
+}
+
 /*   ___  __   __     __  ____    __  _  _  ____  __   
  *  / __)/  \ (  )   /  \(  _ \  (  )( \/ )(  _ \(  )  
  * ( (__(  O )/ (_/\(  O ))   /   )( / \/ \ ) __// (_/\
@@ -305,9 +351,38 @@ Term::IO &Term::IO::operator<<(const char &key)
     return *this;
 }
 
+Term::IO &Term::IO::operator<<(const Point &point)
+{
+#if defined(WINDOWS)
+    if (!windows_setup)
+    {
+        setupWindows();
+    }
+    // if using Windows, use windows.h
+    // We must have a reference to the active terminal for Windows
+    // Coordinates are (x, y). Columns are x, rows are y, so r/c becomes c/r
+    COORD cor = {(short)point.col, (short)point.row};
+    SetConsoleCursorPosition(stdout_terminal, cor);
+#else
+    // for some reason, row and column in ANSI start at 1, we want it to start at 0
+    int r = point.row + 1;
+    int c = point.col + 1;
+    // on *nix use ANSI escape
+    std::string pos = "\033[" + std::to_string(r) + ';' + std::to_string(c) + 'f';
+    std::cout << pos;
+#endif
+    return *this;
+}
+
 Term::IO &Term::IO::operator<<(const Color &color)
 {
     set_color(color);
+    return *this;
+}
+
+Term::IO &Term::IO::operator<<(Command *command)
+{
+    command->call();
     return *this;
 }
 

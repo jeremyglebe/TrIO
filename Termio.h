@@ -112,16 +112,14 @@ std::wostream &operator<<(wostream &wout, string text);
 class Point
 {
 public:
+    unsigned short row;
+    unsigned short col;
     /**
      * Creates a point
      * @param row the row where the point is positioned
      * @param col the column where the point is positioned
      */
     Point(const unsigned short &row, const unsigned short &col);
-
-private:
-    unsigned short row;
-    unsigned short col;
 };
 typedef Point pnt;
 typedef Point p;
@@ -159,21 +157,22 @@ public:
 typedef Command com;
 
 /**
- * The Clear singleton is a command which, when passed to an IO object, will
+ * The Clear object is a command which, when passed to an IO object, will
  * clear the terminal's screen using its call() method.
  */
-class Clear : Command
+class Clear : public Command
 {
 public:
     void call() override;
 };
 typedef Clear clr;
+static Command *clear = new Clear();
 
 /**
  * The Sleep object is a command which, when passed to an IO object, will
  * make the program sleep for a time specified in the objects constructor.
  */
-class Sleep : Command
+class Sleep : public Command
 {
 public:
     /**
@@ -218,9 +217,27 @@ public:
     IO &operator<<(const double &number);
 
     // special output operations
+    /**
+     * Moves the terminal's cursor to a row/column specified by
+     * a Point object.
+     * @param point the Point containing the row/column to move to
+     * @return this object, for chaining outputs.
+     */
     IO &operator<<(const Point &point);
+    /**
+     * Changes the color of the terminal to the foreground and
+     * background specified by the Color object.
+     * @param color a Color object containing a foreground and background code
+     * (codes are specified in Termio.h near the top of the file)
+     * @return this object, for chaining outputs.
+     */
     IO &operator<<(const Color &color);
-    IO &operator<<(const Command &command);
+    /**
+     * Executes a command object.
+     * @param command the command to use .call() on.
+     * @return this object, for chaining outputs.
+     */
+    IO &operator<<(Command *command);
 
     // input operations
     IO &operator>>(string &str_var);
