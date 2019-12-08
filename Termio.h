@@ -157,41 +157,54 @@ public:
 typedef Command com;
 
 /**
+ * CLEAR IS A SINGLETON: This means there is only ONE instance of the class.
+ * The instance is defined by Clear::get() and there are two references to it
+ * declared immediately below the class.
  * The Clear object is a command which, when passed to an IO object, will
  * clear the terminal's screen using its call() method.
  */
 class Clear : public Command
 {
 public:
+    static Clear &get();
     void call() override;
+
+private:
+    Clear();
 };
-typedef Clear clr;
-static Clear clear = Clear();
+static Clear &clear = Clear::get();
+static Clear &clr = Clear::get();
 
 /**
+ * SLEEP IS A SINGLETON: This means there is only ONE instance of the class.
+ * The instance is defined by Sleep::get() and there are two references to it
+ * declared immediately below the class.
  * The Sleep object is a command which, when passed to an IO object, will
  * make the program sleep for a time specified in the objects constructor.
  */
 class Sleep : public Command
 {
 public:
-    /**
-     * Creates a sleep command object.
-     * @param ms how much time, in miliseconds (1/1000 of a second), the
-     * program should sleep when this object is passed to an IO object.
-     */
-    Sleep(const unsigned int &ms);
+    static Sleep &get();
     /**
      * Stops the thread (or program, if single-threaded) for a number of
      * milliseconds determined by the data member of this object.
      */
     void call() override;
+    /**
+     * Sets how many ms the thread should sleep
+     * when using the sleep object.
+     * @param ms how much time, in miliseconds (1/1000 of a second), the
+     * program should sleep when this object is passed to an IO object.
+     */
+    Sleep &operator()(int ms);
 
 private:
     unsigned int ms;
+    Sleep();
 };
-typedef Sleep sleep;
-typedef Sleep slp;
+static Sleep &sleep = Sleep::get();
+static Sleep &slp = Sleep::get();
 
 /**
  * Main input/output control for the library. Can use various other objects to

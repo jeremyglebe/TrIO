@@ -182,14 +182,31 @@ std::wostream &Term::operator<<(wostream &wout, string text)
  * Graceful font
  * http://patorjk.com/software/taag/
  */
-Term::Sleep::Sleep(const unsigned int &ms)
+Term::Sleep::Sleep() {}
+
+Term::Sleep &Term::Sleep::get()
+{
+    static Sleep instance;
+    return instance;
+}
+
+Term::Sleep &Term::Sleep::operator()(int ms)
 {
     this->ms = ms;
+    return get();
 }
 
 void Term::Sleep::call()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+Term::Clear::Clear() {}
+
+Term::Clear &Term::Clear::get()
+{
+    static Clear instance;
+    return instance;
 }
 
 void Term::Clear::call()
