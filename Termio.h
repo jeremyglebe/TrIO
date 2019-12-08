@@ -34,6 +34,23 @@ using std::vector;
 using std::wcout;
 using std::wostream;
 
+/* ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗       
+ * ██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝       
+ * ██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║   ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗       
+ * ██╔═══╝ ██╔══██╗██║   ██║   ██║   ██║   ██║   ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║       
+ * ██║     ██║  ██║╚██████╔╝   ██║   ╚██████╔╝   ██║      ██║   ██║     ███████╗███████║       
+ * ╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝       
+ *                                                                                            
+ *    ██╗        ██████╗ ██████╗ ███╗   ██╗███████╗████████╗ █████╗ ███╗   ██╗████████╗███████╗
+ *    ██║       ██╔════╝██╔═══██╗████╗  ██║██╔════╝╚══██╔══╝██╔══██╗████╗  ██║╚══██╔══╝██╔════╝
+ * ████████╗    ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ███████║██╔██╗ ██║   ██║   ███████╗
+ * ██╔═██╔═╝    ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║╚██╗██║   ██║   ╚════██║
+ * ██████║      ╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ██║  ██║██║ ╚████║   ██║   ███████║
+ * ╚═════╝       ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+ * ANSI Shadow font
+ * http://patorjk.com/software/taag/
+*/
+
 /**
  * TermIO Color codes, used to choose foreground and background
  * in the Color object
@@ -48,60 +65,25 @@ const unsigned short CYAN = 6;
 const unsigned short MAGENTA = 7;
 const unsigned short WHITE = 8;
 
-/**
- * Fuses two multi-line string together for printing side-by-side
- * @param left the string that will be on the left half of the fused string
- * @param right the string that will be on the right half of the fused string
- * @param pad bool, whether to pad each line of the string to be the same width
- */
+/** Fuses two multi-line string together for printing side-by-side */
 inline string fuse(string left, string right, bool pad = false);
 
-/**
- * Fuses multiple multi-line strings together for printing side-by-side.
- * @param strings an initializer list of strings to fuse, left to right
- * Initializer lists look like: {myStrVar, "Hello", "test", other_string_var}
- * @param pad bool, whether to pad each line of the string to be the same width
- */
+/** Fuses multiple multi-line strings together for printing side-by-side. */
 inline string fuse(std::initializer_list<string> strings, bool pad = false);
 
-/**
- * Split a string and store each new substring in a vector.
- * @param text the original string
- * @param delim the delimiting character to split by
- * @param include determines if the delimeter should be included in the
- * returned substrings
- * @return vector containing each substring
- */
+/** Split a string and store each new substring in a vector. */
 inline vector<string> split(string text, char delim, bool include = false);
 
-/**
- * Split a string, using a regular expression as a delimeter, and store
- * each new substring in a vector.
- * @param text the original string
- * @param delim the regular expression to match and split by
- * @param include determines if the delimeter should be included in the
- * returned substrings
- * @return vector containing each substring
- */
+/** Split a string, using a regular expression as a delimeter, and store
+ * each new substring in a vector. */
 inline vector<string> rsplit(string text, string delim, bool include = false);
 
-/**
- * Replaces all instances of a substring in a text with a new string.
- * @param text the main text to replace in
- * @param from the substring to replace
- * @param to the new string to replace it with
- * @return the updated main string
- */
+/** Replaces all instances of a substring in a text with a new string. */
 inline string replace_all(string text, string from, string to);
 
-/**
- * It is easier to consistently pass in strings instead of keeping track of
+/** It is easier to consistently pass in strings instead of keeping track of
  * wide vs narrow strings. So, we will overload << to make wostreams able to
- * work with strings (by converting them inside the operation to wstring)
- * @param wout the wide ostream to be output to
- * @param text the text to be converted to a wstring
- * @return the same wostream being used (for chaining output statements)
- */
+ * work with strings (by converting them inside the operation to wstring) */
 inline std::wostream &operator<<(wostream &wout, string text);
 
 /**
@@ -114,11 +96,7 @@ class Point
 public:
     unsigned short row;
     unsigned short col;
-    /**
-     * Creates a point
-     * @param row the row where the point is positioned
-     * @param col the column where the point is positioned
-     */
+    /** Creates a point */
     inline Point(const unsigned short &row, const unsigned short &col);
 };
 typedef Point pnt;
@@ -134,11 +112,7 @@ class Color
 public:
     unsigned short fg;
     unsigned short bg;
-    /**
-     * Creates a Color object
-     * @param fg color code for the foreground
-     * @param bg color code for the background
-     */
+    /** Creates a Color object */
     inline Color(const unsigned short &fg, const unsigned short &bg = 0);
 };
 typedef Color col;
@@ -159,7 +133,7 @@ typedef Command com;
 /**
  * CLEAR IS A SINGLETON: This means there is only ONE instance of the class.
  * The instance is defined by Clear::get() and there are two references to it
- * declared immediately below the class.
+ * declared, Term::clear and Term::clr.
  * The Clear object is a command which, when passed to an IO object, will
  * clear the terminal's screen using its call() method.
  */
@@ -178,7 +152,7 @@ static Clear &clr = Clear::get();
 /**
  * SLEEP IS A SINGLETON: This means there is only ONE instance of the class.
  * The instance is defined by Sleep::get() and there are two references to it
- * declared immediately below the class.
+ * declared, Term::sleep and Term::slp.
  * The Sleep object is a command which, when passed to an IO object, will
  * make the program sleep for a time specified in the objects constructor.
  */
@@ -186,17 +160,11 @@ class Sleep : public Command
 {
 public:
     inline static Sleep &get();
-    /**
-     * Stops the thread (or program, if single-threaded) for a number of
-     * milliseconds determined by the data member of this object.
-     */
+    /** Stops the thread (or program, if single-threaded) for a number of
+     * milliseconds determined by the data member of this object. */
     inline void call() override;
-    /**
-     * Sets how many ms the thread should sleep
-     * when using the sleep object.
-     * @param ms how much time, in miliseconds (1/1000 of a second), the
-     * program should sleep when this object is passed to an IO object.
-     */
+    /** Sets how many ms the thread should sleep when
+     * using the sleep object. */
     inline Sleep &operator()(int ms);
 
 private:
@@ -214,54 +182,39 @@ class IO
 {
 public:
     // constructors
+
     inline IO();
     inline IO(ostream &out);
     inline IO(wostream &wout);
 
     // output operations
-    /**
-     * Prints a string to the terminal and interprets any color codes found
-     * @param text the string to print to the terminal
-     * @return a reference to this IO object, to account for chained outputs
-     */
+
+    /** Prints a string to the terminal and interprets any color codes found */
     inline IO &operator<<(string text);
+    /** Prints a character to the terminal */
     inline IO &operator<<(const char &letter);
+    /** Prints an integer to the terminal */
     inline IO &operator<<(const int &number);
+    /** Prints a double to the terminal */
     inline IO &operator<<(const double &number);
 
     // special output operations
-    /**
-     * Moves the terminal's cursor to a row/column specified by
-     * a Point object.
-     * @param point the Point containing the row/column to move to
-     * @return this object, for chaining outputs.
-     */
+
+    /** Moves the terminal's cursor to a row/column specified
+     * by a Point object. */
     inline IO &operator<<(const Point &point);
-    /**
-     * Changes the color of the terminal to the foreground and
-     * background specified by the Color object.
-     * @param color a Color object containing a foreground and background code
-     * (codes are specified in Termio.h near the top of the file)
-     * @return this object, for chaining outputs.
-     */
+    /** Changes the color of the terminal to the foreground and
+     * background specified by the Color object. */
     inline IO &operator<<(const Color &color);
-    /**
-     * Executes a command object.
-     * @param command the command to use .call() on.
-     * @return this object, for chaining outputs.
-     */
+    /** Executes a command object. */
     inline IO &operator<<(Command &command);
 
     // input operations
+
     inline IO &operator>>(string &str_var);
     inline IO &operator>>(char *&str_var);
-    /**
-     * Gets a single character from stdin.
-     * Input is unbuffered, echoless, blocking. For non-blocking, use a
-     * separate thread.
-     * @param ch_var the variable to read a character into
-     * @return this object (for chaining inputs)
-     */
+    /** Gets a single character from stdin. Input is unbuffered, echoless,
+     * blocking. For non-blocking, use a separate thread. */
     inline IO &operator>>(char &ch_var);
 
 private:
@@ -289,14 +242,24 @@ private:
  * http://patorjk.com/software/taag/
 */
 
-/*  _  _  ____  __    ____  ____  ____    ____  _  _  __ _   ___  ____  __  __   __ _    __  _  _  ____  __   
- * / )( \(  __)(  )  (  _ \(  __)(  _ \  (  __)/ )( \(  ( \ / __)(_  _)(  )/  \ (  ( \  (  )( \/ )(  _ \(  )  
- * ) __ ( ) _) / (_/\ ) __/ ) _)  )   /   ) _) ) \/ (/    /( (__   )(   )((  O )/    /   )( / \/ \ ) __// (_/\
- * \_)(_/(____)\____/(__)  (____)(__\_)  (__)  \____/\_)__) \___) (__) (__)\__/ \_)__)  (__)\_)(_/(__)  \____/
- * Graceful font
+/* dP     dP           dP                                 88888888b                              dP   oo                            
+ * 88     88           88                                 88                                     88                                 
+ * 88aaaaa88a .d8888b. 88  88d888b. .d8888b. 88d888b.    a88aaaa    dP    dP 88d888b. .d8888b. d8888P dP .d8888b. 88d888b. .d8888b. 
+ * 88     88  88ooood8 88  88'  `88 88ooood8 88'  `88     88        88    88 88'  `88 88'  `""   88   88 88'  `88 88'  `88 Y8ooooo. 
+ * 88     88  88.  ... 88  88.  .88 88.  ... 88           88        88.  .88 88    88 88.  ...   88   88 88.  .88 88    88       88 
+ * dP     dP  `88888P' dP  88Y888P' `88888P' dP           dP        `88888P' dP    dP `88888P'   dP   dP `88888P' dP    dP `88888P' 
+ * ooooooooooooooooooooooo~88~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ *                         dP                                                                                                       
+ * Nancyj-Underlined font
  * http://patorjk.com/software/taag/
  */
 
+/**
+ * Fuses two multi-line string together for printing side-by-side
+ * @param left the string that will be on the left half of the fused string
+ * @param right the string that will be on the right half of the fused string
+ * @param pad bool, whether to pad each line of the string to be the same width
+ */
 std::string Term::fuse(string left, string right, bool pad)
 {
     string result = "";
@@ -355,6 +318,12 @@ std::string Term::fuse(string left, string right, bool pad)
     return result;
 }
 
+/**
+ * Fuses multiple multi-line strings together for printing side-by-side.
+ * @param strings an initializer list of strings to fuse, left to right
+ * Initializer lists look like: {myStrVar, "Hello", "test", other_string_var}
+ * @param pad bool, whether to pad each line of the string to be the same width
+ */
 std::string Term::fuse(std::initializer_list<string> strings, bool pad)
 {
     // Variable for storing the resulting string
@@ -370,16 +339,33 @@ std::string Term::fuse(std::initializer_list<string> strings, bool pad)
     return result;
 }
 
-// Just calls the regular expression split but delimeter does not have to be
-// a regular expression
+/**
+ * Split a string and store each new substring in a vector.
+ * @param text the original string
+ * @param delim the delimiting character to split by
+ * @param include determines if the delimeter should be included in the
+ * returned substrings
+ * @return vector containing each substring
+ */
 std::vector<std::string> Term::split(string text, char delim, bool include)
 {
+    // Just calls the regular expression split but delimeter does not have to be
+    // a regular expression
     return rsplit(text, string(1, delim), include);
 }
 
-// Part of the rsplit() implementation came from Stack Overflow user Marcin,
-// see the following post:
-// https://stackoverflow.com/questions/16749069/c-split-string-by-regex
+/**
+ * Split a string, using a regular expression as a delimeter, and store
+ * each new substring in a vector.
+ * Part of the rsplit() implementation came from Stack Overflow user Marcin,
+ * see the following post:
+ * https://stackoverflow.com/questions/16749069/c-split-string-by-regex
+ * @param text the original string
+ * @param delim the regular expression to match and split by
+ * @param include determines if the delimeter should be included in the
+ * returned substrings
+ * @return vector containing each substring
+ */
 std::vector<std::string> Term::rsplit(string text, string delim, bool include)
 {
     std::vector<std::string> elems;
@@ -423,6 +409,13 @@ std::vector<std::string> Term::rsplit(string text, string delim, bool include)
     return elems;
 }
 
+/**
+ * Replaces all instances of a substring in a text with a new string.
+ * @param text the main text to replace in
+ * @param from the substring to replace
+ * @param to the new string to replace it with
+ * @return the updated main string
+ */
 std::string Term::replace_all(string text, string from, string to)
 {
     size_t start_pos = 0;
@@ -439,6 +432,14 @@ std::string Term::replace_all(string text, string from, string to)
     return text;
 }
 
+/**
+ * It is easier to consistently pass in strings instead of keeping track of
+ * wide vs narrow strings. So, we will overload << to make wostreams able to
+ * work with strings (by converting them inside the operation to wstring)
+ * @param wout the wide ostream to be output to
+ * @param text the text to be converted to a wstring
+ * @return the same wostream being used (for chaining output statements)
+ */
 std::wostream &Term::operator<<(wostream &wout, string text)
 {
     /**
@@ -454,13 +455,18 @@ std::wostream &Term::operator<<(wostream &wout, string text)
     return wout;
 }
 
-/*   ___  __   _  _  _  _   __   __ _  ____    __  _  _  ____  __   
- *  / __)/  \ ( \/ )( \/ ) / _\ (  ( \(    \  (  )( \/ )(  _ \(  )  
- * ( (__(  O )/ \/ \/ \/ \/    \/    / ) D (   )( / \/ \ ) __// (_/\
- *  \___)\__/ \_)(_/\_)(_/\_/\_/\_)__)(____/  (__)\_)(_/(__)  \____/
- * Graceful font
+/*  a88888b.                                                        dP     .88888.  dP       oo          
+ * d8'   `88                                                        88    d8'   `8b 88                   
+ * 88        .d8888b. 88d8b.d8b. 88d8b.d8b. .d8888b. 88d888b. .d888b88    88     88 88d888b. dP .d8888b. 
+ * 88        88'  `88 88'`88'`88 88'`88'`88 88'  `88 88'  `88 88'  `88    88     88 88'  `88 88 Y8ooooo. 
+ * Y8.   .88 88.  .88 88  88  88 88  88  88 88.  .88 88    88 88.  .88    Y8.   .8P 88.  .88 88       88 
+ *  Y88888P' `88888P' dP  dP  dP dP  dP  dP `88888P8 dP    dP `88888P8     `8888P'  88Y8888' 88 `88888P' 
+ * oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo88~ooooooooo
+ *                                                                                           dP          
+ * Nancyj-Underlined font
  * http://patorjk.com/software/taag/
  */
+
 Term::Sleep::Sleep() {}
 
 Term::Sleep &Term::Sleep::get()
@@ -469,12 +475,20 @@ Term::Sleep &Term::Sleep::get()
     return instance;
 }
 
+/**
+ * Sets how many ms the thread should sleep
+ * when using the sleep object.
+ * @param ms how much time, in miliseconds (1/1000 of a second), the
+ * program should sleep when this object is passed to an IO object.
+ */
 Term::Sleep &Term::Sleep::operator()(int ms)
 {
     this->ms = ms;
     return get();
 }
 
+/** Stops the thread (or program, if single-threaded) for a number of
+ * milliseconds determined by the data member of this object. */
 void Term::Sleep::call()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
@@ -523,10 +537,21 @@ void Term::Clear::call()
 #endif
 }
 
-/*  ____   __  __  __ _  ____    _  _  ____  ____  _  _   __  ____  ____ 
- * (  _ \ /  \(  )(  ( \(_  _)  ( \/ )(  __)(_  _)/ )( \ /  \(    \/ ___)
- *  ) __/(  O ))( /    /  )(    / \/ \ ) _)   )(  ) __ ((  O )) D (\___ \
- * (__)   \__/(__)\_)__) (__)   \_)(_/(____) (__) \_)(_/ \__/(____/(____/
+/*  888888ba           oo            dP      8888ba.88ba             dP   dP                      dP          
+ *  88    `8b                        88      88  `8b  `8b            88   88                      88          
+ * a88aaaa8P' .d8888b. dP 88d888b. d8888P    88   88   88 .d8888b. d8888P 88d888b. .d8888b. .d888b88 .d8888b. 
+ *  88        88'  `88 88 88'  `88   88      88   88   88 88ooood8   88   88'  `88 88'  `88 88'  `88 Y8ooooo. 
+ *  88        88.  .88 88 88    88   88      88   88   88 88.  ...   88   88    88 88.  .88 88.  .88       88 
+ *  dP        `88888P' dP dP    dP   dP      dP   dP   dP `88888P'   dP   dP    dP `88888P' `88888P8 `88888P' 
+ * ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ * Nancyj-Underlined font
+ * http://patorjk.com/software/taag/
+ */
+
+/**
+ * Creates a point
+ * @param row the row where the point is positioned
+ * @param col the column where the point is positioned
  */
 Term::Point::Point(const unsigned short &row, const unsigned short &col)
 {
@@ -534,12 +559,21 @@ Term::Point::Point(const unsigned short &row, const unsigned short &col)
     this->col = col;
 }
 
-/*   ___  __   __     __  ____    __  _  _  ____  __   
- *  / __)/  \ (  )   /  \(  _ \  (  )( \/ )(  _ \(  )  
- * ( (__(  O )/ (_/\(  O ))   /   )( / \/ \ ) __// (_/\
- *  \___)\__/ \____/ \__/(__\_)  (__)\_)(_/(__)  \____/
- * Graceful font
+/*  a88888b.          dP                      8888ba.88ba             dP   dP                      dP          
+ * d8'   `88          88                      88  `8b  `8b            88   88                      88          
+ * 88        .d8888b. 88 .d8888b. 88d888b.    88   88   88 .d8888b. d8888P 88d888b. .d8888b. .d888b88 .d8888b. 
+ * 88        88'  `88 88 88'  `88 88'  `88    88   88   88 88ooood8   88   88'  `88 88'  `88 88'  `88 Y8ooooo. 
+ * Y8.   .88 88.  .88 88 88.  .88 88          88   88   88 88.  ...   88   88    88 88.  .88 88.  .88       88 
+ *  Y88888P' `88888P' dP `88888P' dP          dP   dP   dP `88888P'   dP   dP    dP `88888P' `88888P8 `88888P' 
+ * oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ * Nancyj-Underlined font
  * http://patorjk.com/software/taag/
+ */
+
+/**
+ * Creates a Color object
+ * @param fg color code for the foreground
+ * @param bg color code for the background
  */
 Term::Color::Color(const unsigned short &fg, const unsigned short &bg)
 {
@@ -547,11 +581,13 @@ Term::Color::Color(const unsigned short &fg, const unsigned short &bg)
     this->bg = bg;
 }
 
-/*   __  __     __  _  _  ____  __   
- *  (  )/  \   (  )( \/ )(  _ \(  )  
- *   )((  O )   )( / \/ \ ) __// (_/\
- *  (__)\__/   (__)\_)(_/(__)  \____/
- * Graceful font
+/* ██╗ ██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+ * ██║██╔═══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+ * ██║██║   ██║    ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+ * ██║██║   ██║    ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+ * ██║╚██████╔╝    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+ * ╚═╝ ╚═════╝     ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+ * ANSI Shadow font
  * http://patorjk.com/software/taag/
  */
 
@@ -567,6 +603,68 @@ Term::IO::IO()
 #endif
 }
 
+/* dP                               dP      8888ba.88ba             dP   dP                      dP          
+ * 88                               88      88  `8b  `8b            88   88                      88          
+ * 88 88d888b.  88d888b. dP    dP d8888P    88   88   88 .d8888b. d8888P 88d888b. .d8888b. .d888b88 .d8888b. 
+ * 88 88'  `88  88'  `88 88    88   88      88   88   88 88ooood8   88   88'  `88 88'  `88 88'  `88 Y8ooooo. 
+ * 88 88    88  88.  .88 88.  .88   88      88   88   88 88.  ...   88   88    88 88.  .88 88.  .88       88 
+ * dP dP    dP  88Y888P' `88888P'   dP      dP   dP   dP `88888P'   dP   dP    dP `88888P' `88888P8 `88888P' 
+ * oooooooooooo~88~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ *              dP                                                                                           
+ * Nancyj-Underlined font
+ * http://patorjk.com/software/taag/
+ */
+
+/**
+ * Gets a single character from stdin.
+ * Input is unbuffered, echoless, blocking. For non-blocking, use a
+ * separate thread.
+ * @param ch_var the variable to read a character into
+ * @return this object (for chaining inputs)
+ */
+Term::IO &Term::IO::operator>>(char &ch_var)
+{
+#if defined(WINDOWS)
+    // Keeps track of the console mode we started with
+    DWORD mode;
+    // Get the current mode so we can restore it later
+    GetConsoleMode(stdin_terminal, &mode);
+    // Set the console mode to unbuffered and echoless
+    SetConsoleMode(stdin_terminal, 0);
+
+    ch_var = std::cin.get();
+
+    // Restore the original console mode
+    SetConsoleMode(stdin_terminal, mode);
+#else
+    // turn off echo and get the input without a buffer
+    system("stty -brkint -ignpar -istrip -icrnl -ixon -opost -isig -icanon -echo");
+    // get the next stdin character
+    //key = getchar();
+    std::cin >> ch_var;
+    // set the terminal back to buffered input and echo
+    system("stty cooked echo");
+#endif
+    return *this;
+}
+
+/*  .88888.             dP                        dP      8888ba.88ba             dP   dP                      dP          
+ * d8'   `8b            88                        88      88  `8b  `8b            88   88                      88          
+ * 88     88 dP    dP d8888P  88d888b. dP    dP d8888P    88   88   88 .d8888b. d8888P 88d888b. .d8888b. .d888b88 .d8888b. 
+ * 88     88 88    88   88    88'  `88 88    88   88      88   88   88 88ooood8   88   88'  `88 88'  `88 88'  `88 Y8ooooo. 
+ * Y8.   .8P 88.  .88   88    88.  .88 88.  .88   88      88   88   88 88.  ...   88   88    88 88.  .88 88.  .88       88 
+ *  `8888P'  `88888P'   dP    88Y888P' `88888P'   dP      dP   dP   dP `88888P'   dP   dP    dP `88888P' `88888P8 `88888P' 
+ * oooooooooooooooooooooooooo~88~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ *                            dP                                                                                           
+ * Nancyj-Underlined font
+ * http://patorjk.com/software/taag/
+ */
+
+/**
+ * Prints a string to the terminal and interprets any color codes found
+ * @param text the string to print to the terminal
+ * @return a reference to this IO object, to account for chained outputs
+ */
 Term::IO &Term::IO::operator<<(string text)
 {
 #if defined(WINDOWS)
@@ -634,19 +732,78 @@ Term::IO &Term::IO::operator<<(string text)
     return *this;
 }
 
-Term::IO &Term::IO::operator<<(const char &key)
+/**
+ * Prints a character to the terminal
+ * @param letter the character to print to the terminal
+ * @return a reference to this IO object, to account for chained outputs
+ */
+Term::IO &Term::IO::operator<<(const char &letter)
 {
     if (wide)
     {
-        *wout << key;
+        *wout << letter;
     }
     else
     {
-        *out << key;
+        *out << letter;
     }
     return *this;
 }
 
+/**
+ * Prints an integer to the terminal
+ * @param number the integer to print to the terminal
+ * @return a reference to this IO object, to account for chained outputs
+ */
+Term::IO &Term::IO::operator<<(const int &number)
+{
+    if (wide)
+    {
+        *wout << number;
+    }
+    else
+    {
+        *out << number;
+    }
+    return *this;
+}
+
+/**
+ * Prints a double to the terminal
+ * @param number the double to print to the terminal
+ * @return a reference to this IO object, to account for chained outputs
+ */
+Term::IO &Term::IO::operator<<(const double &number)
+{
+    if (wide)
+    {
+        *wout << number;
+    }
+    else
+    {
+        *out << number;
+    }
+    return *this;
+}
+
+/* .d88888b                              oo          dP    8888ba.88ba             dP   dP                      dP          
+ * 88.    "'                                         88    88  `8b  `8b            88   88                      88          
+ * `Y88888b.  88d888b. .d8888b. .d8888b. dP .d8888b. 88    88   88   88 .d8888b. d8888P 88d888b. .d8888b. .d888b88 .d8888b. 
+ *       `8b  88'  `88 88ooood8 88'  `"" 88 88'  `88 88    88   88   88 88ooood8   88   88'  `88 88'  `88 88'  `88 Y8ooooo. 
+ * d8'   .8P  88.  .88 88.  ... 88.  ... 88 88.  .88 88    88   88   88 88.  ...   88   88    88 88.  .88 88.  .88       88 
+ *  Y88888P   88Y888P' `88888P' `88888P' dP `88888P8 dP    dP   dP   dP `88888P'   dP   dP    dP `88888P' `88888P8 `88888P' 
+ * oooooooooo~88~ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ *            dP                                                                                                            
+ * Nancyj-Underlined font
+ * http://patorjk.com/software/taag/
+ */
+
+/**
+ * Moves the terminal's cursor to a row/column specified by
+ * a Point object.
+ * @param point the Point containing the row/column to move to
+ * @return this object, for chaining outputs.
+ */
 Term::IO &Term::IO::operator<<(const Point &point)
 {
 #if defined(WINDOWS)
@@ -670,41 +827,27 @@ Term::IO &Term::IO::operator<<(const Point &point)
     return *this;
 }
 
+/**
+ * Changes the color of the terminal to the foreground and
+ * background specified by the Color object.
+ * @param color a Color object containing a foreground and background code
+ * (codes are specified in Termio.h near the top of the file)
+ * @return this object, for chaining outputs.
+ */
 Term::IO &Term::IO::operator<<(const Color &color)
 {
     set_color(color);
     return *this;
 }
 
+/**
+ * Executes a command object.
+ * @param command the command to use .call() on.
+ * @return this object, for chaining outputs.
+ */
 Term::IO &Term::IO::operator<<(Command &command)
 {
     command.call();
-    return *this;
-}
-
-Term::IO &Term::IO::operator>>(char &ch_var)
-{
-#if defined(WINDOWS)
-    // Keeps track of the console mode we started with
-    DWORD mode;
-    // Get the current mode so we can restore it later
-    GetConsoleMode(stdin_terminal, &mode);
-    // Set the console mode to unbuffered and echoless
-    SetConsoleMode(stdin_terminal, 0);
-
-    ch_var = std::cin.get();
-
-    // Restore the original console mode
-    SetConsoleMode(stdin_terminal, mode);
-#else
-    // turn off echo and get the input without a buffer
-    system("stty -brkint -ignpar -istrip -icrnl -ixon -opost -isig -icanon -echo");
-    // get the next stdin character
-    //key = getchar();
-    std::cin >> ch_var;
-    // set the terminal back to buffered input and echo
-    system("stty cooked echo");
-#endif
     return *this;
 }
 
