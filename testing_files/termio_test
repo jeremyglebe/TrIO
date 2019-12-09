@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <iostream>
 #include <string>
 #include "Termio.h"
@@ -8,7 +7,6 @@ int main()
     Term::IO io;
 
     // Print a rainbow alphabet
-    io << "Testing colors with a Rainbow-Alphabet\n";
     std::string s = "";
     for (char let = 'a', code = '1'; let <= 'z'; let++)
     {
@@ -19,7 +17,6 @@ int main()
     io << s;
 
     // Print random color alphabet
-    io << "Testing colors with a Rando-Alphabet\n";
     srand(time(NULL));
     s = "";
     for (char let = 'a'; let <= 'z'; let++)
@@ -54,52 +51,11 @@ int main()
     io >> input_test << input_test << input_test << input_test >> input_test << input_test << input_test >> input_test << input_test;
 
     // Test fusing strings
-    io << "\nTesting fusing numerous strings...\n";
+    io << "Testing fusing numerous strings...\n";
     std::string blank = "";
     blank += "&58┌────┐\n";
     blank += "&58│■■■■│\n";
     blank += "&58│■■■■│\n";
     blank += "&58└────┘\n";
     io << Term::fuse({blank, blank, blank, blank});
-    for (int i = 0; i < 3; i++)
-        io << Term::sleep(1333) << '.';
-
-    // Test clear, moving cursor & sleeping by random X's around the screen
-    io << Term::clear << "Testing clear, move & sleep by printing X's";
-    for (int i = 0; i < 3; i++)
-        io << Term::sleep(1333) << '.';
-    for (int i = 0; i < 40; i++)
-    {
-        short fg = rand() % 8 + 1;
-        short row = rand() % 40;
-        short col = rand() % 80;
-        io << Term::sleep(100) << Term::Point(row, col) << Term::Color(fg, Term::BLACK) << 'X';
-    }
-    io << Term::sleep(3000) << Term::clear << Term::Color(0, 0);
-=======
-#include "TermGame.h"
-
-int main(){
-    using namespace TermGame;
-    using namespace TermPrint;
-
-    print("Hello World!\n");
-    print("Testing... Testing...\n");
-    print("Goodbye World!\n");
-
-    // plant randomly positioned green X's in the terminal
-    srand(time(NULL));
-    for(int i = 0; i < 9; i++){
-        moveCursor(rand() % 3 + 3, rand() % 80);
-        TermGame::sleep(10);
-        print("&40X");
-        TermGame::sleep(10);
-    }
-
-    moveCursor(0, 0);
-    print("&30X");
-    moveCursor(1, 1);
-    print("&30X");
-
->>>>>>> master
 }
