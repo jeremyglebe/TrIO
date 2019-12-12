@@ -7,6 +7,7 @@ int main()
     Term::IO io;
 
     // Print a rainbow alphabet
+    io << "Testing colors with a Rainbow-Alphabet\n";
     std::string s = "";
     for (char let = 'a', code = '1'; let <= 'z'; let++)
     {
@@ -17,6 +18,7 @@ int main()
     io << s;
 
     // Print random color alphabet
+    io << "Testing colors with a Rando-Alphabet\n";
     srand(time(NULL));
     s = "";
     for (char let = 'a'; let <= 'z'; let++)
@@ -51,11 +53,26 @@ int main()
     io >> input_test << input_test << input_test << input_test >> input_test << input_test << input_test >> input_test << input_test;
 
     // Test fusing strings
-    io << "Testing fusing numerous strings...\n";
+    io << "\nTesting fusing numerous strings...\n";
     std::string blank = "";
     blank += "&58┌────┐\n";
     blank += "&58│■■■■│\n";
     blank += "&58│■■■■│\n";
     blank += "&58└────┘\n";
     io << Term::fuse({blank, blank, blank, blank});
+    for (int i = 0; i < 3; i++)
+        io << Term::sleep(1333) << '.';
+
+    // Test clear, moving cursor & sleeping by random X's around the screen
+    io << Term::clear << "Testing clear, move & sleep by printing X's";
+    for (int i = 0; i < 3; i++)
+        io << Term::sleep(1333) << '.';
+    for (int i = 0; i < 40; i++)
+    {
+        short fg = rand() % 8 + 1;
+        short row = rand() % 40;
+        short col = rand() % 80;
+        io << Term::sleep(100) << Term::Point(row, col) << Term::Color(fg, Term::BLACK) << 'X';
+    }
+    io << Term::sleep(3000) << Term::clear << Term::Color(0, 0);
 }
