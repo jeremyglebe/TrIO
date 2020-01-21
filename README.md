@@ -10,6 +10,7 @@ you're good to go! Make sure to have `#include "Termio.h"` in the file you
 want to use the library in.
 
 ### History & Purpose
+**TermIO is, first and foremost, intended to be an educational tool.**
 This library was originally designed for the Computer Science II class that I
 was a supplemental instructor for. Our objective was to let them make a fun
 program that wasn't limited to basic text output without all the overhead of
@@ -93,3 +94,52 @@ foreground and background, respectively, and are replaced with numeric codes fro
 
 To print a literal '&' you only need to enter the character twice like so: "&&"
 (Note, when escaping to print a literal '&', there will not be a B value)
+
+### String Fusion
+When designing a terminal-based UI, one might find themselves wanting to print
+two multi-line strings next to each other. This seems a simple task initially,
+but it quickly becomes complicated.
+Let's use the example of a card game in which you wish to print two cards
+side-by-side. The strings are defined below:
+```cpp
+std::string card1 = "";
+card1 += "&28┌──┐\n";
+card1 += "&28│D9│\n";
+card1 += "&28└──┘\n";
+
+std::string card2 = "";
+card2 += "&18┌──┐\n";
+card2 += "&18│S2│\n";
+card2 += "&18└──┘\n";
+```
+Suppose we wish to print these two strings next to each other. We might be
+tempted to do something like this:
+```cpp
+Term:IO io;
+io << card1 << card2;
+```
+But the results would be of the form
+```
+┌──┐
+│D9│
+└──┘
+┌──┐
+│S2│
+└──┘
+```
+(Of course, these would be colored when printed in the terminal. Markdown has
+no easy provision to display these results.)
+Clearly, this isn't what we wanted. TermIO does have a solution. We can fuse
+together two strings with the `Term::fuse` function. It accepts a list of
+strings (encased between `{}` brackets) and returns a new string where the
+components have been zipped together. Example:
+```cpp
+std::string both_cards = Term::fuse({card1, card2});
+io << card3;
+```
+Result:
+```
+┌──┐┌──┐
+│D9││S2│
+└──┘└──┘
+```
