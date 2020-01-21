@@ -95,7 +95,21 @@ foreground and background, respectively, and are replaced with numeric codes fro
 To print a literal '&' you only need to enter the character twice like so: "&&"
 (Note, when escaping to print a literal '&', there will not be a B value)
 
-### String Fusion
+### A Note on Unicode
+TermIO does enable support for Unicode characters ("wide" characters) within
+strings on both Windows and *nix systems. (though *nix supports them by
+default) However, even when Windows is configured to accept wide characters in
+the terminal, there is the limitation of font. Default fonts for the Windows
+terminal are missing a large number of Unicode characters! This is unfortunate
+because Unicode is wonderful for creating menus and UIs and just generally fun
+output. I recommend downloading and installing a Unicode friendly font, then
+setting it to be your default.
+To set the default font, or font for the current CMD prompt, right click the
+bar at the top of your CMD window. Click on defaults or properties.
+I recommend  the font **Deja Vu Sans Mono** or one of many great fonts in
+the [Deja Vu Fonts Collection](https://dejavu-fonts.github.io/). (just make sure you choose one that is Unicode friendly!)
+
+## String Fusion
 When designing a terminal-based UI, one might find themselves wanting to print
 two multi-line strings next to each other. This seems a simple task initially,
 but it quickly becomes complicated.
