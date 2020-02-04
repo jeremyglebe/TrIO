@@ -210,12 +210,13 @@ public:
     inline IO &operator<<(Command &command);
 
     // input operations
-
-    inline IO &operator>>(string &str_var);
-    inline IO &operator>>(char *&str_var);
     /** Gets a single character from stdin. Input is unbuffered, echoless,
      * blocking. For non-blocking, use a separate thread. */
     inline IO &operator>>(char &ch_var);
+    /** Gets a single key from stdin (characters or arrow keys). Input is
+     * unbuffered, echoless, blocking. For non-blocking, use a separate
+     * thread. */
+    inline IO &operator>>(char *&str_var);
 
 private:
     ostream *out;
@@ -625,6 +626,10 @@ Term::IO::IO()
 Term::IO &Term::IO::operator>>(char &ch_var)
 {
 #if defined(WINDOWS)
+    // Setup Windows if we haven't yet.
+    if (!windows_setup)
+        setupWindows();
+
     // Keeps track of the console mode we started with
     DWORD mode;
     // Get the current mode so we can restore it later
@@ -739,6 +744,12 @@ Term::IO &Term::IO::operator<<(string text)
  */
 Term::IO &Term::IO::operator<<(const char &letter)
 {
+#if defined(WINDOWS)
+    // Setup Windows if we haven't yet.
+    if (!windows_setup)
+        setupWindows();
+#endif
+
     if (wide)
     {
         *wout << letter;
@@ -757,6 +768,12 @@ Term::IO &Term::IO::operator<<(const char &letter)
  */
 Term::IO &Term::IO::operator<<(const int &number)
 {
+#if defined(WINDOWS)
+    // Setup Windows if we haven't yet.
+    if (!windows_setup)
+        setupWindows();
+#endif
+
     if (wide)
     {
         *wout << number;
@@ -775,6 +792,12 @@ Term::IO &Term::IO::operator<<(const int &number)
  */
 Term::IO &Term::IO::operator<<(const double &number)
 {
+#if defined(WINDOWS)
+    // Setup Windows if we haven't yet.
+    if (!windows_setup)
+        setupWindows();
+#endif
+
     if (wide)
     {
         *wout << number;
