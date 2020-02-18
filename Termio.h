@@ -345,8 +345,12 @@ std::string Term::fuse(std::initializer_list<string> strings, bool pad)
 
 /**
  * Fuses multiple multi-line strings together for printing side-by-side.
+ * 
+ * I didn't think you could create a dynamic intializer list, so I just
+ * filled a vector with strings ....
+ * 
  * @param strings a vector of strings ordered left to right
- * I
+ * 
  * @param pad bool, whether to pad each line of the string to be the same width
  */
 std::string Term::fuse(std::vector<string> strings, bool pad)
