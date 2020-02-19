@@ -212,6 +212,7 @@ public:
     // input operations
     /** Gets a single character from stdin. Input is unbuffered, echoless,
      * blocking. For non-blocking, use a separate thread. */
+    inline IO &operator>>(unsigned char &ch_var);
     inline IO &operator>>(char &ch_var);
     /** Gets a single key from stdin (characters or arrow keys). Input is
      * unbuffered, echoless, blocking. For non-blocking, use a separate
@@ -623,7 +624,7 @@ Term::IO::IO()
  * @param ch_var the variable to read a character into
  * @return this object (for chaining inputs)
  */
-Term::IO &Term::IO::operator>>(char &ch_var)
+Term::IO &Term::IO::operator>>(unsigned char &ch_var)
 {
 #if defined(WINDOWS)
     // Setup Windows if we haven't yet.
@@ -637,7 +638,11 @@ Term::IO &Term::IO::operator>>(char &ch_var)
     // Set the console mode to unbuffered and echoless
     SetConsoleMode(stdin_terminal, 0);
 
-    ch_var = std::cin.get();
+    //ch_var = std::cin.get();
+    DWORD cc;
+    TCHAR c = 0;
+    ReadConsole(stdin_terminal, &c, 1, &cc, NULL);
+    ch_var = (unsigned char)c;
 
     // Restore the original console mode
     SetConsoleMode(stdin_terminal, mode);
@@ -650,6 +655,21 @@ Term::IO &Term::IO::operator>>(char &ch_var)
     // set the terminal back to buffered input and echo
     system("stty cooked echo");
 #endif
+    return *this;
+}
+
+/**
+ * Gets a single character from stdin.
+ * Input is unbuffered, echoless, blocking. For non-blocking, use a
+ * separate thread.
+ * @param ch_var the variable to read a character into 
+ * @return this object (for chaining inputs)
+ */
+Term::IO &Term::IO::operator>>(char &ch_var)
+{
+    unsigned char temp;
+    *this >> temp;
+    ch_var = (char)temp;
     return *this;
 }
 
