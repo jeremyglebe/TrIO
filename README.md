@@ -22,6 +22,9 @@ does not come with any complex functionality. Most operations are simply
 operations on an IO object, which should feel very familiar to freshmen or
 sophomore students because of its similarity to std::cin and std::cout.
 
+### Demo
+[![Run on Repl.it](https://repl.it/badge/github/jeremyglebe/TermIO)](https://repl.it/github/jeremyglebe/TermIO)
+
 ## The IO object
 The IO object can receive unbuffered, echoless input from the keyboard and
 store it into a character variable like so:
