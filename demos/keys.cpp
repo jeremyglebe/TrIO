@@ -4,17 +4,17 @@
 int main()
 {
     srand(time(NULL));
-    Term::IO io;
+    trio::IO io;
     char ch;
     io >> ch;
     while (ch != 'q')
     {
-        io << "Key: " << Term::Color(Term::CYAN) << ch;
-        io << Term::Color(Term::DEFAULT);
-        io << ", Code: " << Term::Color(Term::GREEN) << int(ch);
-        io << Term::Color(Term::DEFAULT) << "\n";
-        io << Term::sleep(100);
+        io << "Key: " << trio::Color(trio::CYAN) << ch;
+        io << trio::Color(trio::DEFAULT);
+        io << ", Code: " << trio::Color(trio::GREEN) << int(ch);
+        io << trio::Color(trio::DEFAULT) << "\n";
+        io << trio::sleep(100);
         io >> ch;
     }
-    io << Term::Color(Term::RED) << "goodbye\n";
+    io << trio::Color(trio::RED) << "goodbye\n";
 }

@@ -4,7 +4,7 @@
 
 int main()
 {
-    Term::IO io;
+    trio::IO io;
 
     // Print a rainbow alphabet
     io << "Testing colors with a Rainbow-Alphabet\n";
@@ -59,20 +59,20 @@ int main()
     blank += "&58│■■■■│\n";
     blank += "&58│■■■■│\n";
     blank += "&58└────┘\n";
-    io << Term::fuse({blank, blank, blank, blank});
+    io << trio::fuse({blank, blank, blank, blank});
     for (int i = 0; i < 3; i++)
-        io << Term::sleep(1333) << '.';
+        io << trio::sleep(1333) << '.';
 
     // Test clear, moving cursor & sleeping by random X's around the screen
-    io << Term::clear << "Testing clear, move & sleep by printing X's";
+    io << trio::clear << "Testing clear, move & sleep by printing X's";
     for (int i = 0; i < 3; i++)
-        io << Term::sleep(1333) << '.';
+        io << trio::sleep(1333) << '.';
     for (int i = 0; i < 40; i++)
     {
         short fg = rand() % 8 + 1;
         short row = rand() % 40;
         short col = rand() % 80;
-        io << Term::sleep(100) << Term::Point(row, col) << Term::Color(fg, Term::BLACK) << 'X';
+        io << trio::sleep(100) << trio::Point(row, col) << trio::Color(fg, trio::BLACK) << 'X';
     }
-    io << Term::sleep(3000) << Term::clear << Term::Color(0, 0);
+    io << trio::sleep(3000) << trio::clear << trio::Color(0, 0);
 }
