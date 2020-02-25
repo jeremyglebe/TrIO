@@ -21,6 +21,7 @@
 #else
 // Include only for *nix
 #include <unistd.h>
+#include <termios.h>
 #endif
 
 namespace Term
@@ -674,13 +675,27 @@ Term::IO &Term::IO::operator>>(unsigned char &ch_var)
     // Restore the original console mode
     SetConsoleMode(stdin_terminal, mode);
 #else
-    // turn off echo and get the input without a buffer
-    system("stty -brkint -ignpar -istrip -icrnl -ixon -opost -isig -icanon -echo");
-    // get the next stdin character
-    //key = getchar();
-    std::cin >> ch_var;
-    // set the terminal back to buffered input and echo
-    system("stty cooked echo");
+
+    // borrowed from anonymous stackoverflow user at
+    // https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
+    char buf = 0;
+    struct termios old = {0};
+    if (tcgetattr(0, &old) < 0)
+            perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if (tcsetattr(0, TCSANOW, &old) < 0)
+            perror("tcsetattr ICANON");
+    if (read(0, &buf, 1) < 0)
+            perror ("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if (tcsetattr(0, TCSADRAIN, &old) < 0)
+            perror ("tcsetattr ~ICANON");
+    ch_var = buf;
+
 #endif
     return *this;
 }
