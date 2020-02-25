@@ -53,7 +53,7 @@ using std::wostream;
 */
 
 /**
- * TermIO Color codes, used to choose foreground and background
+ * TrIO Color codes, used to choose foreground and background
  * in the Color object
  */
 const unsigned short DEFAULT = 0;
@@ -741,7 +741,7 @@ Term::IO &Term::IO::operator<<(string text)
 #endif
 
     // Reset the color on every new line, easiest way to do this is just to
-    // replace every '\n' with '&00\n' (using the Termio color escapes)
+    // replace every '\n' with '&00\n' (using the TrIO color escapes)
     text = replace_all(text, "\n", "&00\n");
 
     // Replace every instance of "&&" with, where X represents an
@@ -916,7 +916,7 @@ Term::IO &Term::IO::operator<<(const Point &point)
  * Changes the color of the terminal to the foreground and
  * background specified by the Color object.
  * @param color a Color object containing a foreground and background code
- * (codes are specified in Termio.h near the top of the file)
+ * (codes are specified in trio.hpp near the top of the file)
  * @return this object, for chaining outputs.
  */
 Term::IO &Term::IO::operator<<(const Color &color)

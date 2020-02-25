@@ -1,16 +1,34 @@
-# TermIO: Simple, portable IO customization in your terminal.
+# TrIO: Simple, portable IO customization in your terminal.
 C++ library designed to streamline the use of unicode, colors, and
 unbuffered input in the terminal. Make everything from menu-driven programs to
 simple games without the complexity of GUI or graphics libraries.
 
+(Looking for **TermIO**? You've found it! The library was renamed to avoid
+confusion with *termios*)
+
 ### Installation
-Just download the "Termio.h" file into your project directory, or if you're
+Just download the "trio.hpp" file into your project directory, or if you're
 using an IDE include it by whatever means you would usually do so, and then
-you're good to go! Make sure to have `#include "Termio.h"` in the file you
+you're good to go! Make sure to have `#include "trio.hpp"` in the file you
 want to use the library in.
 
+### Objective
+There are 3 main objective of TrIO:
+  - Allow for easy use of colors in the terminal
+  - Allow for easy unbuffered and echoless input in the terminal
+  - Allow for control of when/where/how output is expressed in the terminal
+There are 3 systems TrIO should (ideally) operate on without error:
+  - Windows (8+)
+  - Mac
+  - Linux
+These are the obvious platforms to work on as they account for the
+*overwhelming* majority of systems. I cannot guarantee compatibility with
+every distribution of Linux. I primarily test with an Ubuntu environment.
+I lack a Mac system to test on. I rely on assistance from friends and the
+internet as a whole.
+
 ### History & Purpose
-**TermIO is, first and foremost, intended to be an educational tool.**
+**TrIO is, first and foremost, intended to be an educational tool.**
 This library was originally designed for the Computer Science II class that I
 was a supplemental instructor for. Our objective was to let them make a fun
 program that wasn't limited to basic text output without all the overhead of
@@ -77,7 +95,7 @@ use with this library. These sequences **do not** correspond with ANSI escapes,
 but they are implemented using ANSI on *nix systems. Use of these sequences
 are portable even on Windows devices that don't support ANSI.
 
-Escape sequences in TermIO are of the form "&FB" where F and B represent the 
+Escape sequences in TrIO are of the form "&FB" where F and B represent the 
 foreground and background, respectively, and are replaced with numeric codes from the chart below.
 
 | Color    | Code |
@@ -96,7 +114,7 @@ To print a literal '&' you only need to enter the character twice like so: "&&"
 (Note, when escaping to print a literal '&', there will not be a B value)
 
 ### A Note on Unicode
-TermIO does enable support for Unicode characters ("wide" characters) within
+TrIO does enable support for Unicode characters ("wide" characters) within
 strings on both Windows and *nix systems. (though *nix supports them by
 default) However, even when Windows is configured to accept wide characters in
 the terminal, there is the limitation of font. Default fonts for the Windows
@@ -143,7 +161,7 @@ But the results would be of the form
 ```
 (Of course, these would be colored when printed in the terminal. Markdown has
 no easy provision to display these results.)
-Clearly, this isn't what we wanted. TermIO does have a solution. We can fuse
+Clearly, this isn't what we wanted. TrIO does have a solution. We can fuse
 together two strings with the `Term::fuse` function. It accepts a list of
 strings (encased between `{}` brackets) and returns a new string where the
 components have been zipped together. Example:

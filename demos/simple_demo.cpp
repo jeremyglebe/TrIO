@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "Termio.h"
+#include "../trio.hpp"
 
 int main()
 {
