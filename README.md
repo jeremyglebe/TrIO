@@ -17,6 +17,7 @@ There are 3 main objective of TrIO:
   - Allow for easy use of colors in the terminal
   - Allow for easy unbuffered and echoless input in the terminal
   - Allow for control of when/where/how output is expressed in the terminal
+  
 There are 3 systems TrIO should (ideally) operate on without error:
   - Windows (8+)
   - Mac
