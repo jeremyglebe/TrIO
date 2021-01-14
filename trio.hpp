@@ -91,7 +91,7 @@ namespace trio
     inline string replace_all(string text, string from, string to);
 
     /** Sleeps the thread for some time (waits time before continuing) */
-    inline void sleep(int ms);
+    inline void sleep_ms(int ms);
 
     /**
      * It is easier to consistently pass in strings instead of keeping track of
@@ -468,7 +468,7 @@ std::string trio::replace_all(string text, string from, string to)
  * @param ms how much time, in miliseconds (1/1000 of a second), the
  * program should sleep
  */
-void trio::sleep(int ms)
+void trio::sleep_ms(int ms)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
@@ -986,7 +986,7 @@ void trio::IO::set_color(Color c)
  */
 trio::IO &trio::IO::sleep(int ms)
 {
-    trio::sleep(ms);
+    trio::sleep_ms(ms);
     return *this;
 }
 

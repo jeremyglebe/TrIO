@@ -13,7 +13,7 @@ int main()
         io << trio::Color(trio::DEFAULT);
         io << ", Code: " << trio::Color(trio::GREEN) << int(ch);
         io << trio::Color(trio::DEFAULT) << "\n";
-        trio::sleep(100);
+        trio::sleep_ms(100);
         io >> ch;
     }
     io << trio::Color(trio::RED) << "goodbye\n";

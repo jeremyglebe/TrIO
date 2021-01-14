@@ -75,7 +75,7 @@ int main()
         io.sleep(100) << trio::Point(row, col) << trio::Color(fg, trio::BLACK) << 'X';
     }
     // Wait 3 seconds
-    trio::sleep(3000);
+    trio::sleep_ms(3000);
     // Clear the screen and reset the color
     io << trio::clear << trio::Color(trio::DEFAULT, trio::DEFAULT);
 }

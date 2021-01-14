@@ -75,9 +75,9 @@ std::string str = "Hello";
 io << trio::clear;
 for (int i = 0; i < str.size(); i++){
     io.sleep(250) << str[i];
-    // The function trio::sleep(int ms) also exists and is equivalent
+    // The function trio::sleep_ms(int ms) also exists and is equivalent
     // The same code above could be written like so:
-    // trio::sleep(250);
+    // trio::sleep_ms(250);
     // io << str[i];
 }
 // Now the cursor will move back to the first position, where it will start
@@ -86,17 +86,18 @@ io << trio::Point(0,0);
 str = "World!\n";
 for (int i = 0; i < str.size(); i++){
     io.sleep(250) << str[i];
-    // The function trio::sleep(int ms) also exists and is equivalent
+    // The function trio::sleep_ms(int ms) also exists and is equivalent
     // The same code above could be written like so:
-    // trio::sleep(250);
+    // trio::sleep_ms(250);
     // io << str[i];
 }
 ```
 
 Note: If you were to get tired of typing `trio::` for everything, you could
 of course utilize the `using` command to avoid it. (Only do this if you are
-certain it will not cause scoping issues. This will make the keyword `sleep`,
-or possibly even `Sleep`, ambiguous in most environments)
+certain it will not cause scoping issues. This may make certain identifiers
+of functions or objects become ambiguous.)
+
 `using namespace Term;`
 
 ### Color Escape Sequences
