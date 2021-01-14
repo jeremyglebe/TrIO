@@ -65,30 +65,45 @@ see the subsection further down.
 
 The IO object can move the cursor, clear the screen, and even make the current
 thread sleep (wait) some number of miliseconds. The Point object makes the
-cursor move to a new location, while singletons clear and slp will cause the
+cursor move to a new location, while commands clear and sleep will cause the
 screen to clear or the program to wait.
 ```cpp
 // The following code will print "Hello" one character at a time with a quarter
 // of a second between each character. (It will clear the screen first, just to
 // demonstrate that functionality)
 std::string str = "Hello";
-io << trio::clear;
+trio::clear_screen();
 for (int i = 0; i < str.size(); i++){
-    io << trio::slp(250) << str[i];
+    io.sleep(250) << str[i];
 }
 // Now the cursor will move back to the first position, where it will start
 // writing "World" a character at a time, overwriting the previous "Hello".
 io << trio::Point(0,0);
 str = "World!\n";
 for (int i = 0; i < str.size(); i++){
-    io << trio::slp(250) << str[i];
+    io.sleep(250) << str[i];
 }
+// The function trio::sleep_ms(int ms) also exists and is
+// equivalent to io.sleep()
+// The same code above could be written like so:
+io << trio::Point(0,0);
+str = "World!\n";
+for (int i = 0; i < str.size(); i++){
+    trio::sleep_ms(250);
+    io << str[i];
+}
+// There also exists io.clear() which is equivalent to clear_screen() and
+// returns the IO object that calls it. This allows clear statements to be
+// chained into output. Example:
+io << "Hello";
+io.sleep(1000).clear() << "World!\n";
 ```
 
 Note: If you were to get tired of typing `trio::` for everything, you could
 of course utilize the `using` command to avoid it. (Only do this if you are
-certain it will not cause scoping issues. This will make the keyword `sleep`,
-or possibly even `Sleep`, ambiguous in most environments)
+certain it will not cause scoping issues. This may make certain identifiers
+of functions or objects become ambiguous.)
+
 `using namespace Term;`
 
 ### Color Escape Sequences
