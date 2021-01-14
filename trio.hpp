@@ -27,13 +27,13 @@
 namespace trio
 {
 
-using std::cout;
-using std::ostream;
-using std::string;
-using std::to_string;
-using std::vector;
-using std::wcout;
-using std::wostream;
+    using std::cout;
+    using std::ostream;
+    using std::string;
+    using std::to_string;
+    using std::vector;
+    using std::wcout;
+    using std::wostream;
 
 /* ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗       
  * ██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝       
@@ -52,190 +52,205 @@ using std::wostream;
  * http://patorjk.com/software/taag/
 */
 
-/**
- * TrIO Color codes, used to choose foreground and background
- * in the Color object
- */
-const unsigned short DEFAULT = 0;
-const unsigned short BLACK = 1;
-const unsigned short RED = 2;
-const unsigned short YELLOW = 3;
-const unsigned short GREEN = 4;
-const unsigned short BLUE = 5;
-const unsigned short CYAN = 6;
-const unsigned short MAGENTA = 7;
-const unsigned short WHITE = 8;
+    /**
+     * TrIO Color codes, used to choose foreground and background
+     * in the Color object
+     */
+    enum ColorCodes
+    {
+        DEFAULT, // Code: 0
+        BLACK,   // Code: 1
+        RED,     // Code: 2
+        YELLOW,  // Code: 3
+        GREEN,   // Code: 4
+        BLUE,    // Code: 5
+        CYAN,    // Code: 6
+        MAGENTA, // Code: 7
+        WHITE    // Code: 8
+    };
 
-/** Fuses two multi-line string together for printing side-by-side */
-inline string fuse(string left, string right, bool pad = false);
+    /** Fuses two multi-line string together for printing side-by-side */
+    inline string fuse(string left, string right, bool pad = false);
 
-/** Fuses multiple multi-line strings together for printing side-by-side. */
-inline string fuse(std::initializer_list<string> strings, bool pad = false);
+    /** Fuses multiple multi-line strings together for printing side-by-side. */
+    inline string fuse(std::initializer_list<string> strings, bool pad = false);
 
-/** Fuses multiple multi-line strings together for printing side-by-side. */
-inline string fuse(std::vector<string> strings, bool pad = false);
+    /** Fuses multiple multi-line strings together for printing side-by-side. */
+    inline string fuse(std::vector<string> strings, bool pad = false);
 
-/** Split a string and store each new substring in a vector. */
-inline vector<string> split(string text, char delim, bool include = false);
+    /** Split a string and store each new substring in a vector. */
+    inline vector<string> split(string text, char delim, bool include = false);
 
-/** Split a string, using a regular expression as a delimeter, and store
- * each new substring in a vector. */
-inline vector<string> rsplit(string text, string delim, bool include = false);
+    /**
+     * Split a string, using a regular expression as a delimeter, and store
+     * each new substring in a vector.
+     */
+    inline vector<string> rsplit(string text, string delim, bool include = false);
 
-/** Replaces all instances of a substring in a text with a new string. */
-inline string replace_all(string text, string from, string to);
+    /** Replaces all instances of a substring in a text with a new string. */
+    inline string replace_all(string text, string from, string to);
 
-/** It is easier to consistently pass in strings instead of keeping track of
- * wide vs narrow strings. So, we will overload << to make wostreams able to
- * work with strings (by converting them inside the operation to wstring) */
-inline std::wostream &operator<<(wostream &wout, string text);
+    /**
+     * It is easier to consistently pass in strings instead of keeping track of
+     * wide vs narrow strings. So, we will overload << to make wostreams able to
+     * work with strings (by converting them inside the operation to wstring)
+     */
+    inline std::wostream &operator<<(wostream &wout, string text);
 
-/**
- * A Point object is used to move the cursor on the terminal.
- * When sent into an IO object, the cursor will change to the Point's
- * row and column position
- */
-class Point
-{
-public:
-    unsigned short row;
-    unsigned short col;
-    /** Creates a point */
-    inline Point(const unsigned short &row, const unsigned short &col);
-};
-typedef Point pnt;
-typedef Point p;
+    /**
+     * A Point object is used to move the cursor on the terminal.
+     * When sent into an IO object, the cursor will change to the Point's
+     * row and column position
+     */
+    class Point
+    {
+    public:
+        unsigned short row;
+        unsigned short col;
+        /** Creates a point */
+        inline Point(const unsigned short &row, const unsigned short &col);
+    };
+    typedef Point pnt;
+    typedef Point p;
 
-/**
- * A Color object is used to color the strings being sent to the terminal.
- * When sent to an IO object, the terminal will begin using the specified
- * foreground and background colors from the Color object.
- */
-class Color
-{
-public:
-    unsigned short fg;
-    unsigned short bg;
-    /** Creates a Color object */
-    inline Color(const unsigned short &fg, const unsigned short &bg = 0);
-};
-typedef Color col;
+    /**
+     * A Color object is used to color the strings being sent to the terminal.
+     * When sent to an IO object, the terminal will begin using the specified
+     * foreground and background colors from the Color object.
+     */
+    class Color
+    {
+    public:
+        unsigned short fg;
+        unsigned short bg;
+        /** Creates a Color object */
+        inline Color(const unsigned short &fg, const unsigned short &bg = 0);
+    };
+    typedef Color col;
 
-/**
- * Commands are objects which when sent to an IO object should run some
- * function.
- * Their function is stored as the call() method. Commands should be unique
- * inherited classes of this super-class and should override call().
- */
-class Command
-{
-public:
-    virtual void call() = 0;
-};
-typedef Command com;
+    /**
+     * Commands are objects which when sent to an IO object should run some
+     * function.
+     * Their function is stored as the call() method. Commands should be unique
+     * inherited classes of this super-class and should override call().
+     */
+    class Command
+    {
+    public:
+        virtual void call() = 0;
+    };
+    typedef Command com;
 
-/**
- * CLEAR IS A SINGLETON: This means there is only ONE instance of the class.
- * The instance is defined by Clear::get() and there are two references to it
- * declared, trio::clear and trio::clr.
- * The Clear object is a command which, when passed to an IO object, will
- * clear the terminal's screen using its call() method.
- */
-class Clear : public Command
-{
-public:
-    inline static Clear &get();
-    inline void call() override;
+    /**
+     * CLEAR IS A SINGLETON: This means there is only ONE instance of the class.
+     * The instance is defined by Clear::get() and there are two references to it
+     * declared, trio::clear and trio::clr.
+     * The Clear object is a command which, when passed to an IO object, will
+     * clear the terminal's screen using its call() method.
+     */
+    class Clear : public Command
+    {
+    public:
+        inline static Clear &get();
+        inline void call() override;
 
-private:
-    inline Clear();
-};
-static Clear &clear = Clear::get();
-static Clear &clr = Clear::get();
+    private:
+        inline Clear();
+    };
+    static Clear &clear = Clear::get();
+    static Clear &clr = Clear::get();
 
-/**
- * SLEEP IS A SINGLETON: This means there is only ONE instance of the class.
- * The instance is defined by Sleep::get() and there are two references to it
- * declared, trio::sleep and trio::slp.
- * The Sleep object is a command which, when passed to an IO object, will
- * make the program sleep for a time specified in the objects constructor.
- */
-class Sleep : public Command
-{
-public:
-    inline static Sleep &get();
-    /** Stops the thread (or program, if single-threaded) for a number of
+    /**
+     * SLEEP IS A SINGLETON: This means there is only ONE instance of the class.
+     * The instance is defined by Sleep::get() and there are two references to it
+     * declared, trio::sleep and trio::slp.
+     * The Sleep object is a command which, when passed to an IO object, will
+     * make the program sleep for a time specified in the objects constructor.
+     */
+    class Sleep : public Command
+    {
+    public:
+        inline static Sleep &get();
+        /** Stops the thread (or program, if single-threaded) for a number of
      * milliseconds determined by the data member of this object. */
-    inline void call() override;
-    /** Sets how many ms the thread should sleep when
+        inline void call() override;
+        /** Sets how many ms the thread should sleep when
      * using the sleep object. */
-    inline Sleep &operator()(int ms);
+        inline Sleep &operator()(int ms);
 
-private:
-    unsigned int ms;
-    inline Sleep();
-};
-static Sleep &sleep = Sleep::get();
-static Sleep &slp = Sleep::get();
+    private:
+        unsigned int ms;
+        inline Sleep();
+    };
+    static Sleep &sleep = Sleep::get();
+    static Sleep &slp = Sleep::get();
 
-/**
- * Main input/output control for the library. Can use various other objects to
- * print, colorize, get input, and various screen functions.
- */
-class IO
-{
-public:
-    // constructors
+    /**
+     * Main input/output control for the library. Can use various other objects to
+     * print, colorize, get input, and various screen functions.
+     */
+    class IO
+    {
+    public:
+        // constructors
+        inline IO();
+        inline IO(ostream &out);
+        inline IO(wostream &wout);
 
-    inline IO();
-    inline IO(ostream &out);
-    inline IO(wostream &wout);
+        // output operations
+        /**
+         * Prints a string to the terminal and interprets
+         * any color codes found
+         */
+        inline IO &operator<<(string text);
+        /** Prints a character to the terminal */
+        inline IO &operator<<(const char &letter);
+        /** Prints an integer to the terminal */
+        inline IO &operator<<(const int &number);
+        /** Prints a double to the terminal */
+        inline IO &operator<<(const double &number);
 
-    // output operations
+        // special output operations
+        /**
+         * Moves the terminal's cursor to a row/column specified
+         * by a Point object.
+         */
+        inline IO &operator<<(const Point &point);
+        /**
+         * Changes the color of the terminal to the foreground and
+         * background specified by the Color object.
+         */
+        inline IO &operator<<(const Color &color);
+        /** Executes a command object. */
+        inline IO &operator<<(Command &command);
 
-    /** Prints a string to the terminal and interprets any color codes found */
-    inline IO &operator<<(string text);
-    /** Prints a character to the terminal */
-    inline IO &operator<<(const char &letter);
-    /** Prints an integer to the terminal */
-    inline IO &operator<<(const int &number);
-    /** Prints a double to the terminal */
-    inline IO &operator<<(const double &number);
+        // input operations
+        /**
+         * Gets a single character from stdin. Input is unbuffered, echoless,
+         * blocking. For non-blocking, use a separate thread.
+         */
+        inline IO &operator>>(unsigned char &ch_var);
+        inline IO &operator>>(char &ch_var);
+        /**
+         * Gets a single key from stdin (characters or arrow keys). Input is
+         * unbuffered, echoless, blocking. For non-blocking, use a separate
+         * thread.
+         */
+        inline IO &operator>>(char *&str_var);
 
-    // special output operations
-
-    /** Moves the terminal's cursor to a row/column specified
-     * by a Point object. */
-    inline IO &operator<<(const Point &point);
-    /** Changes the color of the terminal to the foreground and
-     * background specified by the Color object. */
-    inline IO &operator<<(const Color &color);
-    /** Executes a command object. */
-    inline IO &operator<<(Command &command);
-
-    // input operations
-    /** Gets a single character from stdin. Input is unbuffered, echoless,
-     * blocking. For non-blocking, use a separate thread. */
-    inline IO &operator>>(unsigned char &ch_var);
-    inline IO &operator>>(char &ch_var);
-    /** Gets a single key from stdin (characters or arrow keys). Input is
-     * unbuffered, echoless, blocking. For non-blocking, use a separate
-     * thread. */
-    inline IO &operator>>(char *&str_var);
-
-private:
-    ostream *out;
-    wostream *wout;
-    bool wide;
-    inline void set_color(Color c);
+    private:
+        ostream *out;
+        wostream *wout;
+        bool wide;
+        inline void set_color(Color c);
 
 #if defined(WINDOWS)
-    bool windows_setup;
-    HANDLE stdin_terminal;
-    HANDLE stdout_terminal;
-    inline void setupWindows();
+        bool windows_setup;
+        HANDLE stdin_terminal;
+        HANDLE stdout_terminal;
+        inline void setupWindows();
 #endif
-};
+    };
 } // namespace trio
 // For compatibility with older TrIO programs
 namespace Term = trio;
@@ -623,6 +638,10 @@ trio::Color::Color(const unsigned short &fg, const unsigned short &bg)
  * http://patorjk.com/software/taag/
  */
 
+/**
+ * Default constructor for the IO object.
+ * By default, IO uses a wide stream on Windows and a normal stream on *nix
+ */
 trio::IO::IO()
 {
 #if defined(WINDOWS)
@@ -683,19 +702,19 @@ trio::IO &trio::IO::operator>>(unsigned char &ch_var)
     char buf = 0;
     struct termios old = {0};
     if (tcgetattr(0, &old) < 0)
-            perror("tcsetattr()");
+        perror("tcsetattr()");
     old.c_lflag &= ~ICANON;
     old.c_lflag &= ~ECHO;
     old.c_cc[VMIN] = 1;
     old.c_cc[VTIME] = 0;
     if (tcsetattr(0, TCSANOW, &old) < 0)
-            perror("tcsetattr ICANON");
+        perror("tcsetattr ICANON");
     if (read(0, &buf, 1) < 0)
-            perror ("read()");
+        perror("read()");
     old.c_lflag |= ICANON;
     old.c_lflag |= ECHO;
     if (tcsetattr(0, TCSADRAIN, &old) < 0)
-            perror ("tcsetattr ~ICANON");
+        perror("tcsetattr ~ICANON");
     ch_var = buf;
 
 #endif
@@ -751,8 +770,7 @@ trio::IO &trio::IO::operator<<(string text)
     text = replace_all(text, "&&", '&' + string(1, char(0)));
 
     // Split the string by "&XY" with X and Y as numeric color codes
-    vector<string>
-        strings = rsplit(text, "&[0-8][0-8]", true);
+    vector<string> strings = rsplit(text, "&[0-8][0-8]", true);
 
     // Print each line of the vector
     for (int i = 0; i < strings.size(); i++)
@@ -777,6 +795,7 @@ trio::IO &trio::IO::operator<<(string text)
             // their entirety, other strings we need to skip the first 3 chars
             // which are the color code.
             if (strings[i].size() > 3 && i > 0)
+                // substr() let's us skip to position 3
                 *wout << strings[i].substr(3);
             else
                 *wout << strings[i];
@@ -789,11 +808,12 @@ trio::IO &trio::IO::operator<<(string text)
             // their entirety, other strings we need to skip the first 3 chars
             // which are the color code.
             if (strings[i].size() > 3 && i > 0)
+                // substr() let's us skip to position 3
                 *out << strings[i].substr(3);
             else
                 *out << strings[i];
         }
-
+        // Reset to the default color after printing
         set_color(Color(0, 0));
     }
 
@@ -938,23 +958,50 @@ trio::IO &trio::IO::operator<<(Command &command)
     return *this;
 }
 
+/**
+ * Sets the terminal color using a color object
+ * @param c the color configuration to use on the terminal
+ */
 void trio::IO::set_color(Color c)
 {
+    // TrIO color codes are
+    // 0: Default, 1: Black, 2: Red, 3: Yellow, 4: Green, 5: Blue, 6: Cyan,
+    // 7: Magenta, 8: White
 #if defined(WINDOWS)
+    // These arrays map Trio color codes to Windows color values
+    // For instance, 2 is Trio red, and at index 2 in the array
+    // we have 4, which is Window's code for red
     static const unsigned short _fg[] = {7, 0, 4, 6, 2, 1, 3, 5, 7};
+    // Windows does it's codes kind of weird. The background color is defined by
+    // 16 * the foreground's code. (red=4, bg for red is 64)
+    // Then to actually set the color in windows, we will add the foreground and
+    // background color.
     static const unsigned short _bg[] = {0, 0, 64, 96, 32, 16, 48, 80, 112};
 #else
+    // These are the ansi code equivalents to Trio color codes
+    // TrIO color codes are
+    // 0: Default, 1: Black, 2: Red, 3: Yellow, 4: Green, 5: Blue, 6: Cyan,
+    // 7: Magenta, 8: White
+    // These arrays map Trio color codes to ANSI color codes
+    // For instance, 2 is Trio red, and at index 2 in the array
+    // we have 31, which is ANSI's code for red foreground
     static const unsigned short _fg[] = {39, 30, 31, 33, 32, 34, 36, 35, 37};
     static const unsigned short _bg[] = {49, 40, 41, 43, 42, 44, 46, 45, 47};
 #endif
 
 #if defined(WINDOWS)
+    // We always need to make sure the Windows terminal is configured
+    // before we perform any kind of operations on it
     if (!windows_setup)
         setupWindows();
+    // Setting the color by adding the foreground and background colors
+    // Modifies our stdout terminal
     SetConsoleTextAttribute(stdout_terminal, _fg[c.fg] + _bg[c.bg]);
 #else
+    // Print a sequence of ansi characters to color the terminal
     if (wide)
     {
+        // If we are using wide streams, we use wout
         *wout << "\033[" + to_string(_fg[c.fg]) + to_string(_bg[c.bg]) + 'm';
     }
     else
