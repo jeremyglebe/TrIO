@@ -22,6 +22,7 @@ There are 3 systems TrIO should (ideally) operate on without error:
   - Windows (8+)
   - Mac
   - Linux
+
 These are the obvious platforms to work on as they account for the
 *overwhelming* majority of systems. I cannot guarantee compatibility with
 every distribution of Linux. I primarily test with an Ubuntu environment.
@@ -45,7 +46,7 @@ sophomore students because of its similarity to std::cin and std::cout.
 The IO object can receive unbuffered, echoless input from the keyboard and
 store it into a character variable like so:
 ```cpp
-Term::IO io;
+trio::IO io;
 char myChar;
 io >> myChar;
 ```
@@ -56,7 +57,7 @@ The IO object can print simple strings or characters.
 Used in conjuction with the Color object, the IO object can print text to
 the terminal with color in the foreground and background.
 ```cpp
-io << Term::Color(Term::RED, Term::WHITE)
+io << trio::Color(trio::RED, trio::WHITE)
     << "This text would be red with white background\n";
 ```
 The IO object can also print strings with color sequences defined within them,
@@ -71,20 +72,20 @@ screen to clear or the program to wait.
 // of a second between each character. (It will clear the screen first, just to
 // demonstrate that functionality)
 std::string str = "Hello";
-io << Term::clear;
+io << trio::clear;
 for (int i = 0; i < str.size(); i++){
-    io << Term::slp(250) << str[i];
+    io << trio::slp(250) << str[i];
 }
 // Now the cursor will move back to the first position, where it will start
 // writing "World" a character at a time, overwriting the previous "Hello".
-io << Term::Point(0,0);
+io << trio::Point(0,0);
 str = "World!\n";
 for (int i = 0; i < str.size(); i++){
-    io << Term::slp(250) << str[i];
+    io << trio::slp(250) << str[i];
 }
 ```
 
-Note: If you were to get tired of typing `Term::` for everything, you could
+Note: If you were to get tired of typing `trio::` for everything, you could
 of course utilize the `using` command to avoid it. (Only do this if you are
 certain it will not cause scoping issues. This will make the keyword `sleep`,
 or possibly even `Sleep`, ambiguous in most environments)
@@ -163,11 +164,11 @@ But the results would be of the form
 (Of course, these would be colored when printed in the terminal. Markdown has
 no easy provision to display these results.)
 Clearly, this isn't what we wanted. TrIO does have a solution. We can fuse
-together two strings with the `Term::fuse` function. It accepts a list of
+together two strings with the `trio::fuse` function. It accepts a list of
 strings (encased between `{}` brackets) and returns a new string where the
 components have been zipped together. Example:
 ```cpp
-std::string both_cards = Term::fuse({card1, card2});
+std::string both_cards = trio::fuse({card1, card2});
 io << card3;
 ```
 Result:
