@@ -35,22 +35,22 @@ namespace trio
     using std::wcout;
     using std::wostream;
 
-/* ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗       
- * ██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝       
- * ██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║   ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗       
- * ██╔═══╝ ██╔══██╗██║   ██║   ██║   ██║   ██║   ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║       
- * ██║     ██║  ██║╚██████╔╝   ██║   ╚██████╔╝   ██║      ██║   ██║     ███████╗███████║       
- * ╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝       
- *                                                                                            
- *    ██╗        ██████╗ ██████╗ ███╗   ██╗███████╗████████╗ █████╗ ███╗   ██╗████████╗███████╗
- *    ██║       ██╔════╝██╔═══██╗████╗  ██║██╔════╝╚══██╔══╝██╔══██╗████╗  ██║╚══██╔══╝██╔════╝
- * ████████╗    ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ███████║██╔██╗ ██║   ██║   ███████╗
- * ██╔═██╔═╝    ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║╚██╗██║   ██║   ╚════██║
- * ██████║      ╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ██║  ██║██║ ╚████║   ██║   ███████║
- * ╚═════╝       ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
- * ANSI Shadow font
- * http://patorjk.com/software/taag/
-*/
+    /* ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗       
+     * ██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝       
+     * ██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║   ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗       
+     * ██╔═══╝ ██╔══██╗██║   ██║   ██║   ██║   ██║   ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║       
+     * ██║     ██║  ██║╚██████╔╝   ██║   ╚██████╔╝   ██║      ██║   ██║     ███████╗███████║       
+     * ╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝       
+     *                                                                                            
+     *    ██╗        ██████╗ ██████╗ ███╗   ██╗███████╗████████╗ █████╗ ███╗   ██╗████████╗███████╗
+     *    ██║       ██╔════╝██╔═══██╗████╗  ██║██╔════╝╚══██╔══╝██╔══██╗████╗  ██║╚══██╔══╝██╔════╝
+     * ████████╗    ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ███████║██╔██╗ ██║   ██║   ███████╗
+     * ██╔═██╔═╝    ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║╚██╗██║   ██║   ╚════██║
+     * ██████║      ╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ██║  ██║██║ ╚████║   ██║   ███████║
+     * ╚═════╝       ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+     * ANSI Shadow font
+     * http://patorjk.com/software/taag/
+     */
 
     /**
      * TrIO Color codes, used to choose foreground and background
@@ -89,6 +89,9 @@ namespace trio
 
     /** Replaces all instances of a substring in a text with a new string. */
     inline string replace_all(string text, string from, string to);
+
+    /** Sleeps the thread for some time (waits time before continuing) */
+    inline void sleep(int ms);
 
     /**
      * It is easier to consistently pass in strings instead of keeping track of
@@ -161,31 +164,6 @@ namespace trio
     static Clear &clr = Clear::get();
 
     /**
-     * SLEEP IS A SINGLETON: This means there is only ONE instance of the class.
-     * The instance is defined by Sleep::get() and there are two references to it
-     * declared, trio::sleep and trio::slp.
-     * The Sleep object is a command which, when passed to an IO object, will
-     * make the program sleep for a time specified in the objects constructor.
-     */
-    class Sleep : public Command
-    {
-    public:
-        inline static Sleep &get();
-        /** Stops the thread (or program, if single-threaded) for a number of
-     * milliseconds determined by the data member of this object. */
-        inline void call() override;
-        /** Sets how many ms the thread should sleep when
-     * using the sleep object. */
-        inline Sleep &operator()(int ms);
-
-    private:
-        unsigned int ms;
-        inline Sleep();
-    };
-    static Sleep &sleep = Sleep::get();
-    static Sleep &slp = Sleep::get();
-
-    /**
      * Main input/output control for the library. Can use various other objects to
      * print, colorize, get input, and various screen functions.
      */
@@ -223,6 +201,11 @@ namespace trio
         inline IO &operator<<(const Color &color);
         /** Executes a command object. */
         inline IO &operator<<(Command &command);
+        /**
+         * Calls sleep and returns IO object which allows us
+         * to include waiting in output chains
+         */
+        inline IO &sleep(int ms);
 
         // input operations
         /**
@@ -480,6 +463,17 @@ std::string trio::replace_all(string text, string from, string to)
 }
 
 /**
+ * Makes the program (or rather, current thread) stop executing and wait
+ * a specified length of time before continuing
+ * @param ms how much time, in miliseconds (1/1000 of a second), the
+ * program should sleep
+ */
+void trio::sleep(int ms)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+/**
  * It is easier to consistently pass in strings instead of keeping track of
  * wide vs narrow strings. So, we will overload << to make wostreams able to
  * work with strings (by converting them inside the operation to wstring)
@@ -513,33 +507,6 @@ std::wostream &trio::operator<<(wostream &wout, string text)
  * Nancyj-Underlined font
  * http://patorjk.com/software/taag/
  */
-
-trio::Sleep::Sleep() {}
-
-trio::Sleep &trio::Sleep::get()
-{
-    static Sleep instance;
-    return instance;
-}
-
-/**
- * Sets how many ms the thread should sleep
- * when using the sleep object.
- * @param ms how much time, in miliseconds (1/1000 of a second), the
- * program should sleep when this object is passed to an IO object.
- */
-trio::Sleep &trio::Sleep::operator()(int ms)
-{
-    this->ms = ms;
-    return get();
-}
-
-/** Stops the thread (or program, if single-threaded) for a number of
- * milliseconds determined by the data member of this object. */
-void trio::Sleep::call()
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-}
 
 trio::Clear::Clear() {}
 
@@ -1009,6 +976,18 @@ void trio::IO::set_color(Color c)
         *out << "\033[" + to_string(_fg[c.fg]) + ';' + to_string(_bg[c.bg]) + 'm';
     }
 #endif
+}
+
+/**
+ * Calls sleep and returns IO object which allows us
+ * to include waiting in output chains
+ * @param ms the time in miliseconds to sleep
+ * @return the IO object which this method is called from
+ */
+trio::IO &trio::IO::sleep(int ms)
+{
+    trio::sleep(ms);
+    return *this;
 }
 
 #if defined(WINDOWS)

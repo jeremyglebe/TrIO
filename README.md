@@ -65,7 +65,7 @@ see the subsection further down.
 
 The IO object can move the cursor, clear the screen, and even make the current
 thread sleep (wait) some number of miliseconds. The Point object makes the
-cursor move to a new location, while singletons clear and slp will cause the
+cursor move to a new location, while commands clear and sleep will cause the
 screen to clear or the program to wait.
 ```cpp
 // The following code will print "Hello" one character at a time with a quarter
@@ -74,14 +74,22 @@ screen to clear or the program to wait.
 std::string str = "Hello";
 io << trio::clear;
 for (int i = 0; i < str.size(); i++){
-    io << trio::slp(250) << str[i];
+    io.sleep(250) << str[i];
+    // The function trio::sleep(int ms) also exists and is equivalent
+    // The same code above could be written like so:
+    // trio::sleep(250);
+    // io << str[i];
 }
 // Now the cursor will move back to the first position, where it will start
 // writing "World" a character at a time, overwriting the previous "Hello".
 io << trio::Point(0,0);
 str = "World!\n";
 for (int i = 0; i < str.size(); i++){
-    io << trio::slp(250) << str[i];
+    io.sleep(250) << str[i];
+    // The function trio::sleep(int ms) also exists and is equivalent
+    // The same code above could be written like so:
+    // trio::sleep(250);
+    // io << str[i];
 }
 ```
 

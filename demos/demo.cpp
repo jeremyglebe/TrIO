@@ -61,18 +61,21 @@ int main()
     blank += "&58└────┘\n";
     io << trio::fuse({blank, blank, blank, blank});
     for (int i = 0; i < 3; i++)
-        io << trio::sleep(1333) << '.';
+        io.sleep(1333) << '.';
 
     // Test clear, moving cursor & sleeping by random X's around the screen
     io << trio::clear << "Testing clear, move & sleep by printing X's";
     for (int i = 0; i < 3; i++)
-        io << trio::sleep(1333) << '.';
+        io.sleep(1333) << '.';
     for (int i = 0; i < 40; i++)
     {
         short fg = rand() % 8 + 1;
         short row = rand() % 40;
         short col = rand() % 80;
-        io << trio::sleep(100) << trio::Point(row, col) << trio::Color(fg, trio::BLACK) << 'X';
+        io.sleep(100) << trio::Point(row, col) << trio::Color(fg, trio::BLACK) << 'X';
     }
-    io << trio::sleep(3000) << trio::clear << trio::Color(0, 0);
+    // Wait 3 seconds
+    trio::sleep(3000);
+    // Clear the screen and reset the color
+    io << trio::clear << trio::Color(trio::DEFAULT, trio::DEFAULT);
 }
