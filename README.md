@@ -164,7 +164,7 @@ card2 += "&18└──┘\n";
 Suppose we wish to print these two strings next to each other. We might be
 tempted to do something like this:
 ```cpp
-Term:IO io;
+trio:IO io;
 io << card1 << card2;
 ```
 But the results would be of the form
