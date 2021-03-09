@@ -104,7 +104,7 @@ of course utilize the `using` command to avoid it. (Only do this if you are
 certain it will not cause scoping issues. This may make certain identifiers
 of functions or objects become ambiguous.)
 
-`using namespace Term;`
+`using namespace trio;`
 
 ### Color Escape Sequences
 The IO object can receive strings with special escape sequences designed for
