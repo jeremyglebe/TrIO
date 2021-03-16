@@ -478,7 +478,9 @@ void trio::clear_screen()
     SetConsoleCursorPosition(hConsole, coordScreen);
 #else
     // on *nix use ANSI escape
-    std::cout << "\033[2J";
+    std::cout << "\033[2J" << std::flush;
+    // Return cursor to position 0,0 after clearing screen
+    std::cout << "\033[1;1f" << std::flush;
 #endif
 }
 
@@ -850,7 +852,7 @@ trio::IO &trio::IO::operator<<(const Point &point)
     int c = point.col + 1;
     // on *nix use ANSI escape
     std::string pos = "\033[" + std::to_string(r) + ';' + std::to_string(c) + 'f';
-    std::cout << pos;
+    std::cout << pos << std::flush;
 #endif
     return *this;
 }

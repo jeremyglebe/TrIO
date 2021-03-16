@@ -1,4 +1,6 @@
 *.exe
+*.obj
+*.out
 .vscode/*
 */main
 main
