@@ -717,9 +717,9 @@ trio::IO &trio::IO::operator<<(string text)
             // which are the color code.
             if (strings[i].size() > 3 && i > 0)
                 // substr() let's us skip to position 3
-                *wout << strings[i].substr(3);
+                *wout << strings[i].substr(3) << std::flush;
             else
-                *wout << strings[i];
+                *wout << strings[i] << std::flush;
         }
         else
         {
@@ -730,9 +730,9 @@ trio::IO &trio::IO::operator<<(string text)
             // which are the color code.
             if (strings[i].size() > 3 && i > 0)
                 // substr() let's us skip to position 3
-                *out << strings[i].substr(3);
+                *out << strings[i].substr(3) << std::flush;
             else
-                *out << strings[i];
+                *out << strings[i] << std::flush;
         }
         // Reset to the default color after printing
         set_color(Color(0, 0));
@@ -757,11 +757,11 @@ trio::IO &trio::IO::operator<<(const char &letter)
 
     if (wide)
     {
-        *wout << letter;
+        *wout << letter << std::flush;
     }
     else
     {
-        *out << letter;
+        *out << letter << std::flush;
     }
     return *this;
 }
@@ -781,11 +781,11 @@ trio::IO &trio::IO::operator<<(const int &number)
 
     if (wide)
     {
-        *wout << number;
+        *wout << number << std::flush;
     }
     else
     {
-        *out << number;
+        *out << number << std::flush;
     }
     return *this;
 }
@@ -805,11 +805,11 @@ trio::IO &trio::IO::operator<<(const double &number)
 
     if (wide)
     {
-        *wout << number;
+        *wout << number << std::flush;
     }
     else
     {
-        *out << number;
+        *out << number << std::flush;
     }
     return *this;
 }
@@ -912,11 +912,11 @@ void trio::IO::set_color(Color c)
     if (wide)
     {
         // If we are using wide streams, we use wout
-        *wout << "\033[" + to_string(_fg[c.fg]) + to_string(_bg[c.bg]) + 'm';
+        *wout << "\033[" + to_string(_fg[c.fg]) + to_string(_bg[c.bg]) + 'm' << std::flush;
     }
     else
     {
-        *out << "\033[" + to_string(_fg[c.fg]) + ';' + to_string(_bg[c.bg]) + 'm';
+        *out << "\033[" + to_string(_fg[c.fg]) + ';' + to_string(_bg[c.bg]) + 'm' << std::flush;
     }
 #endif
 }
