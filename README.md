@@ -26,8 +26,6 @@ There are 3 systems TrIO should (ideally) operate on without error:
 These are the obvious platforms to work on as they account for the
 *overwhelming* majority of systems. I cannot guarantee compatibility with
 every distribution of Linux. I primarily test with an Ubuntu environment.
-I lack a Mac system to test on. I rely on assistance from friends and the
-internet as a whole.
 
 ### History & Purpose
 **TrIO is, first and foremost, intended to be an educational tool.**
