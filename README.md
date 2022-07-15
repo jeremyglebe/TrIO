@@ -1,3 +1,5 @@
+![TrIO Logo](./logos/TrIO-logos.png)
+
 # TrIO: Simple, portable IO customization in your terminal.
 C++ library designed to streamline the use of unicode, colors, and
 unbuffered input in the terminal. Make everything from menu-driven programs to
