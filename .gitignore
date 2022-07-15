@@ -5,3 +5,6 @@
 */main
 main
 .cquery
+.replit
+replit.nix
+.ccls-cache/

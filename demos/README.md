@@ -1,0 +1,2 @@
+# Demos
+This folder contains some demonstrations of the syntax and usage of TrIO. I would also recommend checking out [this project (https://github.com/jeremyglebe/TrIOLife)](https://github.com/jeremyglebe/TrIOLife) if you are interested in seeing TrIO used with more complex code including classes.
